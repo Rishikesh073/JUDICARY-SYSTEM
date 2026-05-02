@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+langchain-ollama
+chromadb
+sentence-transformers
+pydantic
+requests
+axios
