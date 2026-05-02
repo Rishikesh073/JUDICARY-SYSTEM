@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-orange: #D97706;
+  --color-primary-orange-hover: #B45309;
+  --color-dark-bg: #0A0A0A;
+  --color-card-bg: #111111;
+  
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+:root {
+  --primary-orange: #D97706;
+  --primary-orange-hover: #B45309;
+  --dark-bg: #0A0A0A;
+  --card-bg: #111111;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-muted: #94A3B8;
+}
+
+@layer base {
+  body {
+    @apply bg-[#0A0A0A] text-slate-300;
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    @apply font-semibold tracking-tight text-white;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-[#111111] border border-white/5 rounded-2xl backdrop-blur-md;
+  }
+
+  .btn-primary {
+    @apply bg-[#D97706] hover:bg-[#B45309] text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-white/5 hover:bg-white/10 border border-white/10 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 active:scale-95;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-orange-200 via-orange-400 to-orange-600;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-[#0A0A0A];
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full hover:bg-white/20;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
