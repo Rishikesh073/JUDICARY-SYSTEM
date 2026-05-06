@@ -18,3 +18,6 @@ chroma_db/
 # OS
 .DS_Store
 Thumbs.db
+
+# Backend Uploads
+backend/uploads/

@@ -1,6 +1,7 @@
-import { BookOpen, Scale, Clock, ShieldCheck, UploadCloud } from 'lucide-react';
+import { BookOpen, Scale, Clock, ShieldCheck, UploadCloud, TrendingUp } from 'lucide-react';
 import ChatInterface from './ChatInterface';
 import ResearchDashboard from './ResearchDashboard';
+import VaultUpload from './VaultUpload';
 
 export default function Dashboard({ onSearch, isLoading }) {
     return (
@@ -43,14 +44,7 @@ export default function Dashboard({ onSearch, isLoading }) {
                     </div>
 
                     {/* Community Upload Node (Objective 3) */}
-                    <div className="bg-gradient-to-br from-indigo-900/40 to-panelBg backdrop-blur-xl border border-indigo-500/30 rounded-2xl p-6 text-center">
-                        <ShieldCheck size={32} className="mx-auto mb-3 text-indigo-400" />
-                        <h3 className="font-semibold text-slate-200 mb-2">Decentralized Vault</h3>
-                        <p className="text-xs text-slate-400 mb-4">Upload new case files. PII will be auto-redacted before community indexing.</p>
-                        <button className="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
-                            <UploadCloud size={16} /> Secure Upload
-                        </button>
-                    </div>
+                    <VaultUpload />
 
                 </div>
             </div>
