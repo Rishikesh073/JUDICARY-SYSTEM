@@ -2,12 +2,18 @@ import json
 import cloudinary
 import cloudinary.uploader
 import time
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from the root folder
+load_dotenv(dotenv_path="../.env")
 
 # Configure Cloudinary (Grab these from your Cloudinary Dashboard)
+# Configure Cloudinary (Loaded from .env)
 cloudinary.config(
-    cloud_name = 'dsr7valkc',
-    api_key = '839485559776489',
-    api_secret = 'E6MRVsRPVrMdBftUmfBRksgyhvU'
+    cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key = os.getenv('CLOUDINARY_API_KEY'),
+    api_secret = os.getenv('CLOUDINARY_API_SECRET')
 )
 
 def upload_to_cloudinary(json_file):

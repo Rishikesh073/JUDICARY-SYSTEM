@@ -5,4 +5,6 @@ chromadb
 sentence-transformers
 pydantic
 requests
-axios
+PyPDF2
+cloudinary
+python-dotenv

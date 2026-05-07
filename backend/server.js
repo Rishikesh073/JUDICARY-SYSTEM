@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+require('dotenv').config({ path: '../.env' });
 
 const app = express();
 
@@ -11,9 +12,9 @@ const fs = require('fs');
 // Set up Multer to handle the physical file upload from React
 const upload = multer({ dest: 'uploads/' });
 
-// --- PASTE YOUR PINATA KEYS HERE ---
-const PINATA_API_KEY = 'f62e7bd976397bb51c19';
-const PINATA_SECRET_KEY = '1be4a2fc55cb3c3cdb4d7cb725b297d8c052836ca6646f41110c90178f5e1d1f';
+// --- PINATA CONFIG (Loaded from .env) ---
+const PINATA_API_KEY = process.env.PINATA_API_KEY;
+const PINATA_SECRET_KEY = process.env.PINATA_SECRET_KEY;
 
 // Middleware
 app.use(cors());
