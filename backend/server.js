@@ -113,25 +113,39 @@ app.post('/api/ask-lexagent', async (req, res) => {
     try {
         const userQuery = req.body.query;
 
-        console.log(`[Express] Received query: "${userQuery}". Forwarding to Python AI...`);
+        console.log(`[Express] Received query: "${userQuery}". Forwarding to Python AI for streaming...`);
 
-        // Forward the request to your FastAPI server
+        // Set headers for SSE
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        
+        // Ensure Express doesn't buffer
+        res.flushHeaders();
+
+        // Forward the request to your FastAPI server with streaming
         const pythonResponse = await axios.post('http://127.0.0.1:8000/api/research', {
             query: userQuery
+        }, {
+            responseType: 'stream'
         });
 
-        console.log("[Express] Received response from Python AI. Sending to frontend.");
+        console.log("[Express] Streaming response from Python AI to frontend...");
 
-        // Send the JSON back to the React frontend
-        res.json(pythonResponse.data);
+        // Pipe the stream directly to the React frontend
+        pythonResponse.data.pipe(res);
 
     } catch (error) {
         console.error("[Express] Error communicating with Python backend:", error.message);
-        res.status(500).json({ error: "Failed to generate legal memo." });
+        // If headers are already sent, we can't send a 500 status code normally,
+        // but if it failed to even connect to Python, headers might not be sent yet if we threw before flushHeaders
+        // Actually flushHeaders sends the headers, so we just end the stream with an error event.
+        res.write(`data: {"type": "error", "message": "Failed to connect to AI Engine"}\n\n`);
+        res.end();
     }
 });
 
-const PORT = 5000;
+const PORT = 5001;
 app.listen(PORT, () => {
     console.log(`🚀 Express bridge running on http://localhost:${PORT}`);
 });

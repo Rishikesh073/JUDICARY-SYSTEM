@@ -11,7 +11,7 @@ const DashboardPage = () => {
   const handleSearch = async (query) => {
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/ask-lexagent', { query });
+      const response = await axios.post('http://localhost:5001/api/ask-lexagent', { query });
       setMemo(response.data);
     } catch (err) {
       console.error(err);
