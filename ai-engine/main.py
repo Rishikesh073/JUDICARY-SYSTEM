@@ -1,24 +1,26 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from agent import run_research_agent
+from graph_engine import run_lexagent_pipeline
 
-app = FastAPI(title="LexAgent API")
+app = FastAPI(title="LexAgent API (5-Agent Pipeline)")
 
-# Define the data structure we expect from the React/Node frontend
 class SearchQuery(BaseModel):
     query: str
 
 @app.post("/api/research")
 async def generate_legal_memo(request: SearchQuery):
     try:
-        # Trigger the Ollama Agent
-        memo_content = run_research_agent(request.query)
+        # Trigger the 5-Agent LangGraph Pipeline
+        final_state = run_lexagent_pipeline(request.query)
         
-        # Return the generated memo back to the frontend
         return {
             "status": "success",
             "query": request.query,
-            "memo": memo_content
+            "memo": final_state["final_memo"],
+            "logs": final_state["logs"],
+            "approved_cases": final_state["approved_cases"],
+            "dissenting_cases": final_state["dissenting_cases"],
+            "graph_data": final_state.get("graph_data", {"nodes": [], "links": []})
         }
     except Exception as e:
         return {

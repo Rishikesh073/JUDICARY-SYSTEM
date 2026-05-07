@@ -8,3 +8,5 @@ requests
 PyPDF2
 cloudinary
 python-dotenv
+langgraph
+langchain-core

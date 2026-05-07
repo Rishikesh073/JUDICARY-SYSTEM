@@ -3,17 +3,16 @@
 LexAgent is a high-fidelity, premium legal research platform designed to fast-track the workflow of advocates and judges. It uses a sophisticated multi-agent pipeline to scan legal precedents, analyze complex queries, and generate court-ready memorandums in seconds.
 
 ## 🚀 Key Features
-- **Agentic Search**: A 5-step pipeline that parses intent, retrieves specific precedents, and filters for high-accuracy results.
-- **Premium Legal Aesthetic**: A dark obsidian theme with burnt orange accents, optimized for professional legal environments.
-- **Live Workspace**: Interactive research interface with real-time status indicators.
-- **Case Explorer**: Tabular view for browsing high-profile judgments (2025 onwards).
-- **One-Click Export**: Download synthesized memos as professionally formatted PDFs.
-- **Fasttrack AI Engine**: Powered by **Llama 3.2 (3B)** for ultra-fast local inference.
+- **5-Agent Pipeline (LangGraph)**: Specialized agents (Parser, Researcher, Summarizer, Critic, Synthesizer) orchestrate the research flow.
+- **Citation Graph**: Interactive **D3.js** network visualization of case relationships.
+- **Premium Legal Aesthetic**: Optimized for professional legal environments with real-time **Agent Activity logs**.
+- **One-Click Export**: Download synthesized memos as professionally formatted PDFs via **jsPDF**.
+- **Decentralized Vault**: IPFS-backed file storage with Pinata for immutable case records.
 
 ## 🛠 Tech Stack
-- **Frontend**: React, Vite, Tailwind CSS v4, Framer Motion, Lucide Icons.
-- **Backend**: Node.js (Express) as an orchestration bridge.
-- **AI Engine**: FastAPI, LangChain, ChromaDB (Vector Store), Ollama.
+- **Frontend**: React, Vite, Tailwind CSS v4, **D3.js**, **jsPDF**, Framer Motion.
+- **Backend**: Node.js (Express) as an orchestration bridge with Pinata (IPFS).
+- **AI Engine**: FastAPI, **LangGraph**, ChromaDB (Vector Store), Ollama (Llama 3.2).
 - **Data**: 2025 Supreme Court judgments with cloud-hosted original PDF links.
 
 ## 🏁 Getting Started
@@ -58,7 +57,14 @@ To run the AI Engine locally, you must install and configure Ollama:
 
 ## 🏗 Architecture & RAG Workflow
 
-LexAgent operates on a **Retrieval-Augmented Generation (RAG)** pipeline to ensure all legal advice is grounded in actual Supreme Court precedents.
+LexAgent uses a multi-agent system powered by **LangGraph** to ensure legal accuracy and prevent hallucinations. For a deep dive, see the [Full Architecture Guide](./architecture.md).
+
+### 1. The 5-Agent Pipeline
+- **Parser**: Structures the query (Intent, Court, Year).
+- **Researcher**: Pulls relevant case law from **ChromaDB**.
+- **Summarizer**: Distills legal logic (Ratio Decidendi).
+- **Critic**: Audits findings and explicitly searches for **Dissenting Views**.
+- **Synthesizer**: Compiles the final memorandum with **D3.js Graph** metadata.
 
 ### 1. Data Ingestion (The 400 Files)
 - **Source**: 400+ Supreme Court Judgments (2025) are stored in PDF format.

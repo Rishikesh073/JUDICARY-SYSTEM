@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Loader2, CheckCircle2, FileText, Download, ExternalLink } from 'lucide-react';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
+import CitationGraph from './CitationGraph';
 
 const STEPS = [
   { id: 1, label: 'Intent parsed' },
@@ -168,6 +169,12 @@ const LiveWorkspace = () => {
                 </div>
 
                 <div className="space-y-8 text-slate-700 leading-relaxed max-h-[500px] overflow-y-auto pr-4 custom-scrollbar">
+                  
+                  {/* CITATION GRAPH INJECTED HERE */}
+                  <div className="mb-8">
+                    <CitationGraph data={memo.graph_data || { nodes: [], links: [] }} />
+                  </div>
+
                   <div className="prose prose-slate max-w-none">
                     {/* Simplified Markdown rendering logic */}
                     <div className="whitespace-pre-wrap font-sans text-sm">{memo.memo}</div>
