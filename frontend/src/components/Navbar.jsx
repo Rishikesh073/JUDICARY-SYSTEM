@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const [isFeaturesOpen, setIsFeaturesOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const features = [
     { name: 'Agentic Reasoning', desc: '5-step autonomous legal pipeline', icon: Sparkles },
@@ -26,7 +27,21 @@ const Navbar = () => {
           <span className="text-xl font-bold tracking-tight text-slate-900 font-serif">LexAgent</span>
         </Link>
 
-        {/* Links */}
+        {/* Mobile: hamburger */}
+        <div className="md:hidden flex items-center gap-2">
+          <button
+            onClick={() => setIsMobileOpen((s) => !s)}
+            aria-expanded={isMobileOpen}
+            aria-label="Open menu"
+            className="p-2 rounded-md bg-slate-100 hover:bg-slate-200 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Links (desktop) */}
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
           <div className="relative">
             <button 
@@ -82,6 +97,38 @@ const Navbar = () => {
             Get started free
           </Link>
         </div>
+      </div>
+
+      {/* Mobile menu panel */}
+      <div className="md:hidden">
+        {isMobileOpen && (
+          <div className="mt-3 mx-4 bg-white/95 border border-slate-200 rounded-2xl shadow-md p-4">
+            <div className="flex flex-col gap-3">
+              <Link to="/how-it-works" className="py-2 px-3 rounded-md hover:bg-slate-50">How it works</Link>
+              <Link to="/explorer" className="py-2 px-3 rounded-md hover:bg-slate-50">Research</Link>
+              <Link to="/vault" className="py-2 px-3 rounded-md hover:bg-slate-50 font-semibold text-orange-600">VAULT</Link>
+              <Link to="/dashboard" className="py-2 px-3 rounded-md hover:bg-slate-50">Sign in</Link>
+              <Link to="/dashboard" className="py-2 px-3 rounded-md bg-orange-600 text-white text-center rounded-lg">Get started free</Link>
+
+              <div className="pt-2 border-t border-slate-100 mt-2">
+                <div className="text-sm font-semibold text-slate-800 mb-2">Features</div>
+                <div className="grid grid-cols-1 gap-2">
+                  {features.map((f) => (
+                    <Link key={f.name} to="/explorer" className="flex items-start gap-3 p-2 rounded-md hover:bg-slate-50">
+                      <div className="bg-orange-50 p-2 rounded-lg text-orange-600">
+                        <f.icon size={16} />
+                      </div>
+                      <div>
+                        <div className="text-slate-900 font-medium text-sm">{f.name}</div>
+                        <div className="text-slate-500 text-xs">{f.desc}</div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

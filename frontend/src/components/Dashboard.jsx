@@ -17,13 +17,13 @@ export default function Dashboard() {
                 {/* Actions Area */}
                 <div className="lg:col-span-2 flex flex-col gap-6">
                     <h2 className="text-xl font-serif text-slate-900 mb-2">Quick Actions</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Link to="/research" className="bg-white shadow-sm hover:shadow-md transition-all border border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-4 group">
                             <div className="p-4 bg-orange-50 rounded-full group-hover:bg-orange-100 transition-colors">
                                 <Search className="text-orange-600" size={32} />
                             </div>
                             <div>
-                                <h3 className="font-bold text-slate-900 text-lg">Start New Research</h3>
+                                <h3 className="font-bold text-slate-900 text-lg sm:text-base">Start New Research</h3>
                                 <p className="text-slate-600 text-sm mt-1">Submit a query to your autonomous clerk</p>
                             </div>
                         </Link>
@@ -44,7 +44,7 @@ export default function Dashboard() {
                 <div className="flex flex-col gap-6">
 
                     {/* Recent Queries */}
-                    <div className="bg-white shadow-sm border border-slate-200 rounded-2xl p-6">
+                    <div className="bg-white shadow-sm border border-slate-200 rounded-2xl p-4 sm:p-6">
                         <h3 className="font-semibold text-slate-900 mb-4 border-b border-slate-100 pb-2">Recent Memos</h3>
                         <div className="flex flex-col gap-4">
                             <RecentItem title="PMLA Bail Conditions (2025)" date="10 mins ago" />
