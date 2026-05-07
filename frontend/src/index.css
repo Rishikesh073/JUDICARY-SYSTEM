@@ -11,37 +11,37 @@
 }
 
 :root {
-  --primary-orange: #D97706;
-  --primary-orange-hover: #B45309;
-  --dark-bg: #0A0A0A;
-  --card-bg: #111111;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --text-muted: #94A3B8;
+  --primary-orange: #EA580C; /* orange-600 */
+  --primary-orange-hover: #C2410C; /* orange-700 */
+  --light-bg: #F8FAFC; /* slate-50 */
+  --card-bg: #FFFFFF;
+  --border-color: #E2E8F0; /* slate-200 */
+  --text-muted: #64748B; /* slate-500 */
 }
 
 @layer base {
   body {
-    @apply bg-[#0A0A0A] text-slate-300;
+    @apply bg-slate-50 text-slate-600;
     font-family: var(--font-sans);
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-serif);
-    @apply font-semibold tracking-tight text-white;
+    @apply font-semibold tracking-tight text-slate-900;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-[#111111] border border-white/5 rounded-2xl backdrop-blur-md;
+    @apply bg-white shadow-sm border border-slate-200 rounded-2xl;
   }
 
   .btn-primary {
-    @apply bg-[#D97706] hover:bg-[#B45309] text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 active:scale-95;
+    @apply bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 active:scale-95 shadow-sm;
   }
 
   .btn-secondary {
-    @apply bg-white/5 hover:bg-white/10 border border-white/10 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 active:scale-95;
+    @apply bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 px-6 py-3 rounded-lg font-medium transition-all duration-200 active:scale-95 shadow-sm;
   }
 
   .text-gradient {
@@ -55,11 +55,11 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-[#0A0A0A];
+  @apply bg-slate-50;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-full hover:bg-white/20;
+  @apply bg-slate-200 rounded-full hover:bg-slate-300;
 }
 
 /* Animations */

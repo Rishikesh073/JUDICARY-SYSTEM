@@ -1,50 +1,57 @@
-import { BookOpen, Scale, Clock, ShieldCheck, UploadCloud, TrendingUp } from 'lucide-react';
-import ChatInterface from './ChatInterface';
-import ResearchDashboard from './ResearchDashboard';
-import VaultUpload from './VaultUpload';
+import { BookOpen, Scale, Clock, ShieldCheck, Search, Library } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-export default function Dashboard({ onSearch, isLoading }) {
+export default function Dashboard() {
     return (
         <div className="flex flex-col gap-8 animate-in fade-in duration-500 pb-20">
 
             {/* Top Stats Row */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <StatCard icon={<BookOpen />} title="Precedents Scanned" value="400+" color="text-blue-400" />
-                <StatCard icon={<Clock />} title="Research Hours Saved" value="14.5 hrs" color="text-orange-400" />
-                <StatCard icon={<ShieldCheck />} title="Verified Citations" value="100%" color="text-emerald-400" />
-                <StatCard icon={<Scale />} title="Active Cases" value="3" color="text-purple-400" />
+                <StatCard icon={<BookOpen />} title="Precedents Scanned" value="400+" color="text-blue-600" />
+                <StatCard icon={<Clock />} title="Research Hours Saved" value="14.5 hrs" color="text-orange-600" />
+                <StatCard icon={<ShieldCheck />} title="Verified Citations" value="100%" color="text-emerald-600" />
+                <StatCard icon={<Scale />} title="Active Cases" value="3" color="text-purple-600" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Research Area (Takes up 2/3 of the screen) */}
+                {/* Actions Area */}
                 <div className="lg:col-span-2 flex flex-col gap-6">
-                    <div className="bg-panelBg backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-serif text-slate-100">LexAgent Research Engine</h2>
-                            <span className="text-xs font-semibold bg-emerald-900/30 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/30">System Online</span>
-                        </div>
-                        <ChatInterface onSearch={onSearch} isLoading={isLoading} />
+                    <h2 className="text-xl font-serif text-slate-900 mb-2">Quick Actions</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <Link to="/research" className="bg-white shadow-sm hover:shadow-md transition-all border border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-4 group">
+                            <div className="p-4 bg-orange-50 rounded-full group-hover:bg-orange-100 transition-colors">
+                                <Search className="text-orange-600" size={32} />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-slate-900 text-lg">Start New Research</h3>
+                                <p className="text-slate-600 text-sm mt-1">Submit a query to your autonomous clerk</p>
+                            </div>
+                        </Link>
+                        
+                        <Link to="/explorer" className="bg-white shadow-sm hover:shadow-md transition-all border border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center text-center gap-4 group">
+                            <div className="p-4 bg-blue-50 rounded-full group-hover:bg-blue-100 transition-colors">
+                                <Library className="text-blue-600" size={32} />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-slate-900 text-lg">Access Legal Library</h3>
+                                <p className="text-slate-600 text-sm mt-1">Browse and explore 50+ years of precedents</p>
+                            </div>
+                        </Link>
                     </div>
-
-                    {/* Integrated Analytics Section */}
-                    <ResearchDashboard />
                 </div>
 
                 {/* Sidebar (Takes up 1/3) */}
                 <div className="flex flex-col gap-6">
 
                     {/* Recent Queries */}
-                    <div className="bg-panelBg backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-                        <h3 className="font-semibold text-slate-200 mb-4 border-b border-white/10 pb-2">Recent Memos</h3>
-                        <div className="flex flex-col gap-3">
+                    <div className="bg-white shadow-sm border border-slate-200 rounded-2xl p-6">
+                        <h3 className="font-semibold text-slate-900 mb-4 border-b border-slate-100 pb-2">Recent Memos</h3>
+                        <div className="flex flex-col gap-4">
                             <RecentItem title="PMLA Bail Conditions (2025)" date="10 mins ago" />
                             <RecentItem title="Benami Transactions Override" date="2 hours ago" />
                             <RecentItem title="Corporate Fraud Asset Seizure" date="Yesterday" />
                         </div>
                     </div>
-
-                    {/* Community Upload Node (Objective 3) */}
-                    <VaultUpload />
 
                 </div>
             </div>
@@ -55,13 +62,13 @@ export default function Dashboard({ onSearch, isLoading }) {
 // Small helper components for the UI
 function StatCard({ icon, title, value, color }) {
     return (
-        <div className="bg-panelBg backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex items-center gap-4">
-            <div className={`p-3 rounded-xl bg-black/40 ${color}`}>
+        <div className="bg-white shadow-sm border border-slate-200 rounded-2xl p-5 flex items-center gap-4">
+            <div className={`p-3 rounded-xl bg-slate-50 ${color}`}>
                 {icon}
             </div>
             <div>
-                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">{title}</p>
-                <p className="text-2xl font-bold text-slate-100">{value}</p>
+                <p className="text-xs text-slate-600 font-medium uppercase tracking-wider">{title}</p>
+                <p className="text-2xl font-bold text-slate-900">{value}</p>
             </div>
         </div>
     );
@@ -70,8 +77,8 @@ function StatCard({ icon, title, value, color }) {
 function RecentItem({ title, date }) {
     return (
         <div className="group cursor-pointer">
-            <p className="text-sm text-slate-300 group-hover:text-orange-400 transition-colors truncate">{title}</p>
-            <p className="text-xs text-slate-500">{date}</p>
+            <p className="text-sm font-medium text-slate-700 group-hover:text-orange-600 transition-colors truncate">{title}</p>
+            <p className="text-xs text-slate-500 mt-1">{date}</p>
         </div>
     );
 }

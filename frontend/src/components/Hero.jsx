@@ -11,7 +11,7 @@ const Hero = () => {
       <div className="max-w-4xl mx-auto text-center">
         <motion.div 
           {...FADE_IN}
-          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-600/10 border border-orange-500/20 text-orange-400 text-xs font-semibold mb-8"
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-600/10 border border-orange-500/20 text-orange-600 text-xs font-semibold mb-8"
         >
           <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
           India's first agentic legal research system
@@ -20,17 +20,16 @@ const Hero = () => {
         <motion.h1 
           {...FADE_IN}
           transition={{ ...FADE_IN.transition, delay: 0.1 }}
-          className="text-5xl md:text-7xl font-serif mb-6 leading-[1.1]"
+          className="text-5xl md:text-7xl font-serif text-slate-900 mb-6 leading-[1.1]"
         >
-          Your autonomous <br />
-          <span className="text-orange-500 italic">junior legal clerk</span>, <br />
-          available 24/7
+          Your autonomous, <br />
+          <span className="text-orange-600 italic">always-available junior legal clerk.</span>
         </motion.h1>
 
         <motion.p 
           {...FADE_IN}
           transition={{ ...FADE_IN.transition, delay: 0.2 }}
-          className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed"
+          className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed"
         >
           Ask a complex legal question. Get a court-ready 2-page memo with verified precedents in under 2 minutes — not 14 hours.
         </motion.p>
@@ -40,10 +39,10 @@ const Hero = () => {
           transition={{ ...FADE_IN.transition, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20"
         >
-          <button className="bg-[#D97706] hover:bg-[#B45309] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-orange-900/30 transition-all hover:scale-105 active:scale-95">
+          <button className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-orange-600/30 transition-all hover:scale-105 active:scale-95">
             Start researching — it's free
           </button>
-          <button className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all">
+          <button className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-900 px-8 py-4 rounded-xl font-bold text-lg shadow-sm transition-all">
             See how it works
           </button>
         </motion.div>
@@ -52,23 +51,23 @@ const Hero = () => {
         <motion.div 
           {...FADE_IN}
           transition={{ ...FADE_IN.transition, delay: 0.4 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-8 py-10 border-y border-white/5"
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 py-10 border-y border-slate-200"
         >
           <div className="flex flex-col items-center gap-1">
-            <span className="text-3xl font-serif text-white">70%</span>
-            <span className="text-xs uppercase tracking-widest text-slate-500 font-medium">Research time saved</span>
+            <span className="text-3xl font-serif text-slate-900">70%</span>
+            <span className="text-xs uppercase tracking-widest text-slate-600 font-medium">Research time saved</span>
           </div>
-          <div className="flex flex-col items-center gap-1 border-l border-white/5">
-            <span className="text-3xl font-serif text-white">90%</span>
-            <span className="text-xs uppercase tracking-widest text-slate-500 font-medium">Citation accuracy</span>
+          <div className="flex flex-col items-center gap-1 border-l border-slate-200">
+            <span className="text-3xl font-serif text-slate-900">90%</span>
+            <span className="text-xs uppercase tracking-widest text-slate-600 font-medium">Citation accuracy</span>
           </div>
-          <div className="flex flex-col items-center gap-1 border-l border-white/5">
-            <span className="text-3xl font-serif text-white">50+</span>
-            <span className="text-xs uppercase tracking-widest text-slate-500 font-medium">Cases per query</span>
+          <div className="flex flex-col items-center gap-1 border-l border-slate-200">
+            <span className="text-3xl font-serif text-slate-900">50+</span>
+            <span className="text-xs uppercase tracking-widest text-slate-600 font-medium">Cases per query</span>
           </div>
-          <div className="flex flex-col items-center gap-1 border-l border-white/5">
-            <span className="text-3xl font-serif text-white">&lt;2min</span>
-            <span className="text-xs uppercase tracking-widest text-slate-500 font-medium">Memo delivery</span>
+          <div className="flex flex-col items-center gap-1 border-l border-slate-200">
+            <span className="text-3xl font-serif text-slate-900">&lt;2min</span>
+            <span className="text-xs uppercase tracking-widest text-slate-600 font-medium">Memo delivery</span>
           </div>
         </motion.div>
       </div>

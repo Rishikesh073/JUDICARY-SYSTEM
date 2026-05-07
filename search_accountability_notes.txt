@@ -1,0 +1,39 @@
+# LexAgent: Semantic Search Accuracy & Accountability Notes
+
+## 1. The "Different Wording" Problem (Semantic vs. Keyword Search)
+LexAgent uses ChromaDB with a Sentence Transformer embedding model (`all-MiniLM-L6-v2`). This means it performs **Semantic Search (Vector Search)** rather than exact keyword matching.
+- When a lawyer searches for "medical negligence", the system converts the *meaning* of that phrase into a vector.
+- If a case uses the wording "doctor's dereliction of duty", its meaning is also converted into a vector.
+- Because the underlying context is the same, their vectors will be close together in the database.
+- **Conclusion:** The system will successfully find relevant cases even if the exact keywords differ, because it understands the conceptual meaning.
+
+## 2. How Accuracy is Calculated
+Accuracy is calculated mathematically using "Distance Metrics" (e.g., Cosine Similarity or L2 distance). ChromaDB calculates the distance between the query's vector and every case's vector in the database. The cases with the shortest distance (highest similarity) are ranked as the most accurate results.
+
+## 3. The Accountability Problem (Preventing Irrelevant Cases)
+Currently, `agent.py` pulls the top 3 results (`n_results=3`) regardless of how relevant they actually are. If the database lacks cases on the queried topic, it will simply return the "least bad" irrelevant cases.
+
+### Recommended Fixes for `agent.py` to Implement Later:
+
+**A. Add a Distance/Similarity Threshold to ChromaDB Query**
+Update the query logic to inspect the `distances` returned by ChromaDB. If the distance is too high (i.e., not a good match), filter out that result so the LLM doesn't try to use it.
+
+**B. Add Anti-Hallucination Guardrails to the LLM Prompt**
+Update the prompt in `agent.py` to explicitly give the AI permission to reject irrelevant precedents.
+
+*Proposed Prompt Update:*
+```python
+prompt = f"""You are LexAgent, an elite legal clerk. Write a structured memo for the query: "{query}"
+Use ONLY the precedent below. Cite exact filenames and Cloudinary links.
+
+CRITICAL INSTRUCTION: If the provided precedents are NOT highly relevant to the query, you must explicitly state: "No highly relevant precedents were found in the 2025 database for this query." Do NOT attempt to answer the query using irrelevant cases.
+
+PRECEDENT:
+{context_text}
+
+FORMAT:
+## 1. Executive Summary
+## 2. Key Holdings & Analysis
+## 3. Verified Citations
+"""
+```
