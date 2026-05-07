@@ -19,6 +19,14 @@ export default function ChatInterface({ onSearch, isLoading }) {
                 <textarea
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            if (query.trim() && !isLoading) {
+                                handleSubmit(e);
+                            }
+                        }
+                    }}
                     placeholder="e.g., Find Supreme Court cases from the last 3 years granting PMLA bail due to a lack of a direct money trail."
                     className="w-full bg-white border border-slate-300 rounded-xl p-4 pr-16 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-600/50 resize-none h-32"
                     disabled={isLoading}

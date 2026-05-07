@@ -76,18 +76,23 @@ const LiveWorkspace = () => {
           if (line.startsWith('data: ')) {
             try {
               const data = JSON.parse(line.substring(6));
-              if (data.type === 'status' && data.status === 'complete') {
+              if (data.type === 'error') {
+                throw new Error(data.message);
+              } else if (data.type === 'status' && data.status === 'complete') {
                 if (data.agent === 'researcher') setCurrentStep(2);
                 if (data.agent === 'summarizer') setCurrentStep(3);
                 if (data.agent === 'critic') setCurrentStep(4);
               } else if (data.type === 'payload' && data.agent === 'critic') {
                 const evaluatedCases = data.data;
                 finalMemoContent = evaluatedCases.map((c, i) => 
-                  `### Case ${i+1}: ${c.filename}\n**Verdict:** ${c.verdict} (Confidence: ${c.confidence_score}%)\n\n**Holding:**\n${c.holding}\n\n**Analysis:**\n${c.analysis}\n`
+                  `### Case ${i+1}: ${c.filename}\n**Verdict:** ${c.verdict} (Confidence: ${c.confidence_score}%)\n\n**Holding:**\n${c.holding}\n\n**Ratio Decidendi:**\n${c.ratio_decidendi}\n`
                 ).join('\n---\n\n');
               }
             } catch (e) {
               console.error("Error parsing stream line:", e);
+              if (e.message && e.message !== "Unexpected token d in JSON at position 0" && !e.message.includes("JSON")) {
+                throw e; // rethrow business logic errors
+              }
             }
           }
         }

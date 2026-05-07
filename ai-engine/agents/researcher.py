@@ -1,19 +1,55 @@
+import os
+import json
 import chromadb
 from chromadb.utils import embedding_functions
+from langchain_ollama import OllamaLLM
 
 def run_researcher(query: str):
     print(f"[Researcher] Scanning vector database for: '{query}'")
-    chroma_client = chromadb.PersistentClient(path="./chroma_db")
+    
+    # 1. Extract filters from query using LLM
+    llm = OllamaLLM(model="llama3.2")
+    filter_prompt = f"""You are a legal metadata extractor. Extract ChromaDB filters from the query.
+    Query: "{query}"
+    
+    Keys: "act", "year", "court".
+    - act: "PMLA", "IPC", "BNS", etc.
+    - year: The year as a string.
+    - court: "Supreme Court of India" or "High Court".
+    
+    Return ONLY a JSON object. Example: {{"act": "PMLA", "year": "2024"}}
+    If no filters, return {{}}.
+    """
+    
+    metadata_filters = {}
+    try:
+        raw_filters = llm.invoke(filter_prompt).strip()
+        if "```json" in raw_filters:
+            raw_filters = raw_filters.split("```json")[1].split("```")[0].strip()
+        elif "```" in raw_filters:
+            raw_filters = raw_filters.split("```")[1].strip()
+        metadata_filters = json.loads(raw_filters)
+        print(f"[Researcher] Applying filters: {metadata_filters}")
+    except Exception as e:
+        print(f"[Researcher] Filter extraction failed: {e}")
+
+    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "chroma_db")
+    chroma_client = chromadb.PersistentClient(path=db_path)
     sentence_transformer_ef = embedding_functions.DefaultEmbeddingFunction()
     collection = chroma_client.get_collection(
         name="lexagent_precedents", 
         embedding_function=sentence_transformer_ef
     )
     
-    results = collection.query(
-        query_texts=[query],
-        n_results=3
-    )
+    # Apply filters if any
+    query_args = {
+        "query_texts": [query],
+        "n_results": 3
+    }
+    if metadata_filters:
+        query_args["where"] = metadata_filters
+
+    results = collection.query(**query_args)
 
     cases = []
     if results['documents'] and len(results['documents']) > 0:

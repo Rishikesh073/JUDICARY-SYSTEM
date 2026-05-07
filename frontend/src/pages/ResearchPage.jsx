@@ -22,9 +22,11 @@ const ResearchPage = () => {
     const [cases, setCases] = useState(null);
     const [summarizedCases, setSummarizedCases] = useState(null);
     const [evaluatedCases, setEvaluatedCases] = useState(null);
+    const [error, setError] = useState(null);
 
     const handleSearch = async (query) => {
         setIsLoading(true);
+        setError(null);
         setCurrentQuery(query);
         setAgentStatuses({
             researcher: 'waiting',
@@ -80,16 +82,20 @@ const ResearchPage = () => {
                                     setEvaluatedCases(data.data);
                                 }
                             } else if (data.type === 'error') {
-                                console.error("Error from stream:", data.message);
+                                throw new Error(data.message);
                             }
                         } catch (e) {
                             console.error("Error parsing JSON from stream line:", line, e);
+                            if (e.message && !e.message.includes("JSON")) {
+                                throw e; // bubble up the backend errors
+                            }
                         }
                     }
                 }
             }
         } catch (err) {
             console.error(err);
+            setError(err.message || "Failed to communicate with AI Engine. Please make sure the backend is running.");
         } finally {
             setIsLoading(false);
         }
@@ -106,6 +112,12 @@ const ResearchPage = () => {
             <main className="pt-24 px-6 lg:px-12 max-w-7xl mx-auto py-8">
                 <div className="flex flex-col gap-6">
                     <ChatInterface onSearch={handleSearch} isLoading={isLoading} />
+                    
+                    {error && (
+                        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm text-center">
+                            {error}
+                        </div>
+                    )}
                     
                     {/* Agent Status Log */}
                     {(agentStatuses.researcher !== 'waiting' || isLoading) && (
