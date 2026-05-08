@@ -1,9 +1,11 @@
+import os
 import chromadb
 from chromadb.utils import embedding_functions
 from langchain_ollama import OllamaLLM
 
 # 1. Connect to the local vector database we built in Phase 1
-chroma_client = chromadb.PersistentClient(path="./chroma_db")
+db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chroma_db")
+chroma_client = chromadb.PersistentClient(path=db_path)
 sentence_transformer_ef = embedding_functions.DefaultEmbeddingFunction()
 collection = chroma_client.get_collection(
     name="lexagent_precedents", 

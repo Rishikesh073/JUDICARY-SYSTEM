@@ -51,26 +51,63 @@ const LiveWorkspace = () => {
     setMemo(null);
     setError(null);
 
-    // Speed up simulation timings for "Fasttrack" feel
-    const stepTimings = [300, 600, 800, 500, 300];
-    
-    // Start the actual research in parallel
-    const researchPromise = axios.post('http://localhost:5000/api/ask-lexagent', { query });
-
-    for (let i = 0; i < stepTimings.length; i++) {
-      await new Promise(r => setTimeout(r, stepTimings[i]));
-      setCurrentStep(i + 2);
-    }
-
     try {
-      const response = await researchPromise;
-      setMemo(response.data);
+      const response = await fetch('http://localhost:5001/api/ask-lexagent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      });
+
+      if (!response.body) throw new Error("ReadableStream not supported.");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let buffer = "";
+      let finalMemoContent = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n\n');
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.substring(6));
+              if (data.type === 'error') {
+                throw new Error(data.message);
+              } else if (data.type === 'status' && data.status === 'complete') {
+                if (data.agent === 'researcher') setCurrentStep(2);
+                if (data.agent === 'summarizer') setCurrentStep(3);
+                if (data.agent === 'critic') setCurrentStep(4);
+              } else if (data.type === 'payload' && data.agent === 'critic') {
+                const evaluatedCases = data.data;
+                finalMemoContent = evaluatedCases.map((c, i) => 
+                  `### Case ${i+1}: ${c.filename}\n**Verdict:** ${c.verdict} (Confidence: ${c.confidence_score}%)\n\n**Holding:**\n${c.holding}\n\n**Ratio Decidendi:**\n${c.ratio_decidendi}\n`
+                ).join('\n---\n\n');
+              }
+            } catch (e) {
+              console.error("Error parsing stream line:", e);
+              if (e.message && e.message !== "Unexpected token d in JSON at position 0" && !e.message.includes("JSON")) {
+                throw e; // rethrow business logic errors
+              }
+            }
+          }
+        }
+      }
+
+      setCurrentStep(5);
+      setMemo({ query: query, memo: finalMemoContent || "No relevant cases found." });
+
     } catch (err) {
       setError("Engine connection failed. Please ensure the backend is running.");
       console.error(err);
     } finally {
       setIsResearching(false);
-      setCurrentStep(0);
+      setTimeout(() => setCurrentStep(0), 3000);
     }
   };
 

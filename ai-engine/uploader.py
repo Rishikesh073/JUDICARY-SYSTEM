@@ -27,7 +27,13 @@ def upload_to_cloudinary(json_file):
         if 'cloudinary_url' in case:
             continue
 
-        local_path = case['local_path']
+        # Support cross-platform paths using .env
+        pdf_base_dir = os.getenv('PDF_BASE_DIR')
+        if pdf_base_dir:
+            local_path = os.path.join(pdf_base_dir, str(case.get('year', '2025')), case['filename'])
+        else:
+            local_path = case['local_path']
+            
         try:
             # resource_type="raw" is strictly REQUIRED for PDFs in Cloudinary
             response = cloudinary.uploader.upload(local_path, resource_type="raw", folder="lexagent_cases")

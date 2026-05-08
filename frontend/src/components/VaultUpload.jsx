@@ -21,7 +21,7 @@ export default function VaultUpload() {
     const fetchHistory = async () => {
         setHistoryLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/api/vault-history');
+            const response = await axios.get('http://localhost:5001/api/vault-history');
             setHistory(response.data);
         } catch (error) {
             console.error("Failed to fetch history", error);
@@ -46,7 +46,7 @@ export default function VaultUpload() {
         formData.append('caseNumber', caseNumber);
 
         try {
-            const response = await axios.post('http://localhost:5000/api/upload-vault', formData);
+            const response = await axios.post('http://localhost:5001/api/upload-vault', formData);
             setIpfsData(response.data);
             fetchHistory(); // Refresh history after successful upload
         } catch (error) {

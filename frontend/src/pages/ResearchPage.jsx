@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import ChatInterface from '../components/ChatInterface';
-import MemoDisplay from '../components/MemoDisplay';
-import axios from 'axios';
+import AgentLog from '../components/AgentLog';
+import ResearcherPanel from '../components/ResearcherPanel';
+import SummarizerPanel from '../components/SummarizerPanel';
+import CriticPanel from '../components/CriticPanel';
+import CitationGraph from '../components/CitationGraph';
 import { motion } from 'framer-motion';
 
 const ResearchPage = () => {

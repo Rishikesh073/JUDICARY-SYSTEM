@@ -39,10 +39,10 @@ const Hero = () => {
           transition={{ ...FADE_IN.transition, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20"
         >
-          <button className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-orange-600/30 transition-all hover:scale-105 active:scale-95">
+          <button className="bg-orange-600 hover:bg-orange-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg shadow-xl shadow-orange-600/30 transition-all hover:scale-105 active:scale-95">
             Start researching — it's free
           </button>
-          <button className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-900 px-8 py-4 rounded-xl font-bold text-lg shadow-sm transition-all">
+          <button className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-900 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg shadow-sm transition-all">
             See how it works
           </button>
         </motion.div>
