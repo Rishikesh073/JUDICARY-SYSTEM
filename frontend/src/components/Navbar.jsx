@@ -8,12 +8,10 @@ const Navbar = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const features = [
-    { name: 'Agentic Reasoning', desc: '5-step autonomous legal pipeline', icon: Sparkles },
-    { name: 'Semantic Search', desc: 'Context-aware precedent retrieval', icon: Search },
-    { name: 'Case Explorer', desc: 'Browse database by court and act', icon: Database },
-    { name: 'Memo History', desc: 'Your saved research library', icon: History },
-    { name: 'Team Workspace', desc: 'Collaborative firm environment', icon: Users },
-    { name: 'Smart Citations', desc: 'Verified Cloudinary sources', icon: FileText },
+    { name: 'Semantic Search', desc: 'Context-aware precedent retrieval', icon: Search, path: '/research' },
+    { name: 'Case Explorer', desc: 'Browse database by court and act', icon: Database, path: '/explorer' },
+    { name: 'Memo History', desc: 'Your saved research library', icon: History, path: '/history' },
+    { name: 'Smart Citations', desc: 'Verified legal cross-referencing', icon: FileText, path: '/citations' },
   ];
 
   return (
@@ -64,7 +62,7 @@ const Navbar = () => {
                 >
                   <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xl w-[480px] grid grid-cols-2 gap-2">
                     {features.map((f) => (
-                      <Link key={f.name} to="/explorer" className="p-3 rounded-xl hover:bg-slate-50 transition-colors flex gap-3 group">
+                      <Link key={f.name} to={f.path} className="p-3 rounded-xl hover:bg-slate-50 transition-colors flex gap-3 group">
                         <div className="bg-orange-50 p-2 rounded-lg text-orange-600 group-hover:bg-orange-100 transition-colors">
                           <f.icon size={18} />
                         </div>
@@ -81,18 +79,14 @@ const Navbar = () => {
           </div>
 
           <Link to="/how-it-works" className="hover:text-orange-600 transition-colors">How it works</Link>
-          <Link to="/explorer" className="hover:text-orange-600 transition-colors">Research</Link>
+          <Link to="/research" className="hover:text-orange-600 transition-colors">Research</Link>
           <Link to="/vault" className="flex items-center gap-1 bg-orange-50 text-orange-600 px-3 py-1.5 rounded-lg hover:bg-orange-100 font-bold tracking-wide transition-colors">
             <Shield size={14} /> VAULT
           </Link>
-          <button className="hover:text-orange-600 flex items-center gap-1 transition-colors">
-            More <ChevronDown size={14} />
-          </button>
         </div>
 
         {/* CTA */}
         <div className="flex items-center gap-4">
-          <Link to="/dashboard" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Sign in</Link>
           <Link to="/dashboard" className="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm">
             Get started free
           </Link>
@@ -105,16 +99,15 @@ const Navbar = () => {
           <div className="mt-3 mx-4 bg-white/95 border border-slate-200 rounded-2xl shadow-md p-4">
             <div className="flex flex-col gap-3">
               <Link to="/how-it-works" className="py-2 px-3 rounded-md hover:bg-slate-50">How it works</Link>
-              <Link to="/explorer" className="py-2 px-3 rounded-md hover:bg-slate-50">Research</Link>
+              <Link to="/research" className="py-2 px-3 rounded-md hover:bg-slate-50">Research</Link>
               <Link to="/vault" className="py-2 px-3 rounded-md hover:bg-slate-50 font-semibold text-orange-600">VAULT</Link>
-              <Link to="/dashboard" className="py-2 px-3 rounded-md hover:bg-slate-50">Sign in</Link>
               <Link to="/dashboard" className="py-2 px-3 rounded-md bg-orange-600 text-white text-center rounded-lg">Get started free</Link>
 
               <div className="pt-2 border-t border-slate-100 mt-2">
                 <div className="text-sm font-semibold text-slate-800 mb-2">Features</div>
                 <div className="grid grid-cols-1 gap-2">
                   {features.map((f) => (
-                    <Link key={f.name} to="/explorer" className="flex items-start gap-3 p-2 rounded-md hover:bg-slate-50">
+                    <Link key={f.name} to={f.path} className="flex items-start gap-3 p-2 rounded-md hover:bg-slate-50">
                       <div className="bg-orange-50 p-2 rounded-lg text-orange-600">
                         <f.icon size={16} />
                       </div>
