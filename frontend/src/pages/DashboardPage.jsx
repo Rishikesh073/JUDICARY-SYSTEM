@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Dashboard from '../components/Dashboard';
 import axios from 'axios';
-import { motion } from 'framer-motion';
+import PageTransition from '../components/PageTransition';
 
 const DashboardPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,19 +21,16 @@ const DashboardPage = () => {
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="min-h-screen bg-slate-50"
-    >
-      <Navbar />
-      <main className="pt-24 px-6 lg:px-12">
-        <div className="max-w-7xl mx-auto py-8">
-          <Dashboard />
-        </div>
-      </main>
-    </motion.div>
+    <PageTransition>
+      <div className="min-h-screen bg-slate-50">
+        <Navbar />
+        <main className="pt-24 px-6 lg:px-12">
+          <div className="max-w-7xl mx-auto py-8">
+            <Dashboard />
+          </div>
+        </main>
+      </div>
+    </PageTransition>
   );
 };
 

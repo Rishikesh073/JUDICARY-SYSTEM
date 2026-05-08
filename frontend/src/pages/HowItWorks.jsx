@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Cpu, Database, Search, MessageSquare, ShieldCheck, ArrowRight, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import PageTransition from '../components/PageTransition';
 
 const StepCard = ({ icon: Icon, title, desc, details, index }) => {
   return (
@@ -65,64 +66,66 @@ const HowItWorks = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white">
-      <Navbar />
-      
-      <main className="pt-32 pb-24 px-6">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-20">
-            <motion.span 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-xs uppercase tracking-widest text-orange-500 font-bold mb-4 block"
-            >
-              The Architecture of Justice
-            </motion.span>
-            <motion.h1 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-5xl md:text-6xl font-serif mb-6"
-            >
-              How LexAgent Works
-            </motion.h1>
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-slate-500 max-w-2xl mx-auto"
-            >
-              We combine state-of-the-art Large Language Models with local Vector Databases to provide a private, high-accuracy legal research assistant.
-            </motion.p>
-          </div>
-
-          {/* Steps Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
-            {steps.map((step, i) => (
-              <StepCard key={i} {...step} index={i} />
-            ))}
-          </div>
-
-          {/* Bottom Callout */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="bg-gradient-to-br from-orange-600/20 to-amber-900/10 border border-orange-500/20 rounded-3xl p-12 text-center"
-          >
-            <h2 className="text-3xl font-serif mb-4">Ready to fast-track your research?</h2>
-            <p className="text-slate-400 mb-8 max-w-xl mx-auto">Join the future of legal intelligence and save up to 70% of your manual research time.</p>
-            <div className="flex justify-center gap-4">
-              <Link to="/dashboard" className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-xl font-bold transition-all">
-                Enter Dashboard
-              </Link>
-              <Link to="/" className="bg-white/5 hover:bg-white/10 text-white px-8 py-4 rounded-xl font-bold border border-white/10 transition-all flex items-center gap-2">
-                <Home size={18} /> Back to Home
-              </Link>
+    <PageTransition>
+      <div className="min-h-screen bg-[#0A0A0A] text-white">
+        <Navbar />
+        
+        <main className="pt-32 pb-24 px-6">
+          <div className="max-w-6xl mx-auto">
+            {/* Header */}
+            <div className="text-center mb-20">
+              <motion.span 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-xs uppercase tracking-widest text-orange-500 font-bold mb-4 block"
+              >
+                The Architecture of Justice
+              </motion.span>
+              <motion.h1 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-5xl md:text-6xl font-serif mb-6"
+              >
+                How LexAgent Works
+              </motion.h1>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-slate-500 max-w-2xl mx-auto"
+              >
+                We combine state-of-the-art Large Language Models with local Vector Databases to provide a private, high-accuracy legal research assistant.
+              </motion.p>
             </div>
-          </motion.div>
-        </div>
-      </main>
-    </div>
+
+            {/* Steps Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
+              {steps.map((step, i) => (
+                <StepCard key={i} {...step} index={i} />
+              ))}
+            </div>
+
+            {/* Bottom Callout */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="bg-gradient-to-br from-orange-600/20 to-amber-900/10 border border-orange-500/20 rounded-3xl p-12 text-center"
+            >
+              <h2 className="text-3xl font-serif mb-4">Ready to fast-track your research?</h2>
+              <p className="text-slate-400 mb-8 max-w-xl mx-auto">Join the future of legal intelligence and save up to 70% of your manual research time.</p>
+              <div className="flex justify-center gap-4">
+                <Link to="/dashboard" className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-xl font-bold transition-all">
+                  Enter Dashboard
+                </Link>
+                <Link to="/" className="bg-white/5 hover:bg-white/10 text-white px-8 py-4 rounded-xl font-bold border border-white/10 transition-all flex items-center gap-2">
+                  <Home size={18} /> Back to Home
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </main>
+      </div>
+    </PageTransition>
   );
 };
 

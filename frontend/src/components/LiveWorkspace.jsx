@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Loader2, CheckCircle2, FileText, Download, ExternalLink } from 'lucide-react';
+import { Search, Loader2, CheckCircle2, FileText, Download, ExternalLink, ChevronDown, Eye, Scale, Gavel, Users, Clock, AlertTriangle, BookOpen } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 
@@ -14,13 +15,23 @@ const STEPS = [
   { id: 5, label: 'Memo ready' },
 ];
 
+const verdictConfig = {
+  Approved: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', accent: 'bg-emerald-500', label: 'Approved' },
+  Dissenting: { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200', accent: 'bg-purple-500', label: 'Dissenting' },
+  Rejected: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200', accent: 'bg-red-500', label: 'Rejected' },
+};
+
 const LiveWorkspace = () => {
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [isResearching, setIsResearching] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [memo, setMemo] = useState(null);
   const [cases, setCases] = useState([]);
   const [error, setError] = useState(null);
+  const [expandedCards, setExpandedCards] = useState({});
+
+  const toggleCard = (idx) => setExpandedCards(prev => ({ ...prev, [idx]: !prev[idx] }));
 
   const downloadMemo = () => {
     if (!memo) return;
@@ -189,43 +200,221 @@ const LiveWorkspace = () => {
             </div>
           )}
 
-          {/* Memo Output */}
+          {/* Memo Output — Structured Case Cards */}
           <AnimatePresence>
             {memo && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white border border-slate-200 shadow-sm rounded-2xl p-8"
+                className="space-y-6"
               >
-                <div className="flex items-center justify-between mb-8 border-b border-slate-100 pb-6">
+                {/* Memo Header */}
+                <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="bg-orange-600/10 p-2 rounded-lg">
-                      <FileText className="text-orange-500" size={20} />
+                    <div className="bg-orange-600/10 p-2.5 rounded-xl">
+                      <FileText className="text-orange-500" size={22} />
                     </div>
                     <div>
-                      <h3 className="text-lg font-serif text-slate-900">Legal memorandum — {memo.query.substring(0, 30)}...</h3>
-                      <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Synthesized by LexAgent</p>
+                      <h3 className="text-lg font-serif text-slate-900">Legal Memorandum</h3>
+                      <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">{memo.query.substring(0, 50)}...</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <button 
-                      onClick={downloadMemo}
-                      className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-[10px] font-bold px-4 py-2 rounded-lg border border-slate-200 flex items-center gap-2 transition-all"
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <button
+                      onClick={() => navigate('/smartview', { state: { cases, query } })}
+                      className="bg-orange-600 hover:bg-orange-700 text-white text-[11px] font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-sm"
                     >
-                      <Download size={14} /> Download PDF
+                      <Eye size={14} /> SmartView
                     </button>
-                    <span className="bg-green-100 text-green-800 text-[10px] font-bold px-3 py-1 rounded-full border border-green-200 flex items-center gap-1">
-                      <CheckCircle2 size={12} /> Verified
+                    <button
+                      onClick={downloadMemo}
+                      className="bg-slate-50 hover:bg-slate-100 text-slate-600 text-[11px] font-bold px-4 py-2.5 rounded-xl border border-slate-200 flex items-center gap-2 transition-all"
+                    >
+                      <Download size={14} /> PDF
+                    </button>
+                    <span className="bg-green-50 text-green-700 text-[10px] font-bold px-3 py-1.5 rounded-full border border-green-200 flex items-center gap-1">
+                      <CheckCircle2 size={11} /> Verified
                     </span>
                   </div>
                 </div>
 
-                <div className="space-y-8 text-slate-700 leading-relaxed max-h-[500px] overflow-y-auto pr-4 custom-scrollbar">
+                {/* Synthesis Report (Original Memo) */}
+                <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-8">
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <FileText size={14} className="text-orange-500" /> Executive Synthesis
+                  </h4>
                   <div className="prose prose-slate max-w-none">
-                    {/* Simplified Markdown rendering logic */}
-                    <div className="whitespace-pre-wrap font-sans text-sm">{memo.memo}</div>
+                    <div className="whitespace-pre-wrap font-sans text-sm text-slate-700 leading-relaxed">
+                      {memo.memo}
+                    </div>
                   </div>
                 </div>
+
+                <div className="flex items-center gap-3 py-2">
+                  <div className="h-px bg-slate-200 flex-1" />
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Supporting Case Analysis</span>
+                  <div className="h-px bg-slate-200 flex-1" />
+                </div>
+
+                {/* Individual Case Cards */}
+                {cases.map((c, idx) => {
+                  const v = verdictConfig[c.verdict] || verdictConfig.Rejected;
+                  const isExpanded = expandedCards[idx];
+                  return (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.08 }}
+                      className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group"
+                    >
+                      {/* Verdict Accent Bar */}
+                      <div className={`h-1.5 ${v.accent}`} />
+
+                      <div className="p-6">
+                        {/* Card Header */}
+                        <div className="flex items-start justify-between mb-5">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className={`text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md border ${v.bg} ${v.text} ${v.border}`}>
+                                {v.label}
+                              </span>
+                              {c.special_case_flag && c.special_case_flag.startsWith('Yes') && (
+                                <span className="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
+                                  <AlertTriangle size={10} /> Special
+                                </span>
+                              )}
+                            </div>
+                            <h4 className="font-serif text-xl text-slate-900 leading-tight">
+                              {c.filename ? c.filename.replace('.json', '').replace(/_/g, ' ') : `Case ${idx + 1}`}
+                            </h4>
+                          </div>
+                          {/* Confidence Gauge */}
+                          <div className="flex flex-col items-center ml-4">
+                            <div className="relative w-16 h-16">
+                              <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
+                                <path d="M18 2.0845a15.9155 15.9155 0 0 1 0 31.831 15.9155 15.9155 0 0 1 0-31.831" fill="none" stroke="#e2e8f0" strokeWidth="3" />
+                                <path d="M18 2.0845a15.9155 15.9155 0 0 1 0 31.831 15.9155 15.9155 0 0 1 0-31.831" fill="none" stroke={c.confidence_score >= 70 ? '#ea580c' : c.confidence_score >= 40 ? '#f59e0b' : '#ef4444'} strokeWidth="3" strokeDasharray={`${c.confidence_score}, 100`} strokeLinecap="round" />
+                              </svg>
+                              <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-slate-700">{c.confidence_score}%</span>
+                            </div>
+                            <span className="text-[8px] text-slate-400 font-bold uppercase tracking-wider mt-1">Confidence</span>
+                          </div>
+                        </div>
+
+                        {/* Metadata Grid */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
+                          <div className="flex items-center gap-2">
+                            <Scale size={13} className="text-slate-400" />
+                            <div>
+                              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Court</p>
+                              <p className="text-xs font-semibold text-slate-700">{c.year || 'N/A'}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock size={13} className="text-slate-400" />
+                            <div>
+                              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Date</p>
+                              <p className="text-xs font-semibold text-slate-700">{c.date_of_judgment || 'Unknown'}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Users size={13} className="text-slate-400" />
+                            <div>
+                              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Bench</p>
+                              <p className="text-xs font-semibold text-slate-700">{c.bench_strength || 'Unknown'}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Gavel size={13} className="text-slate-400" />
+                            <div>
+                              <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Charges</p>
+                              <p className="text-xs font-semibold text-slate-700 truncate">{c.crime_charges || 'N/A'}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Holding */}
+                        <div className="mb-4">
+                          <h5 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                            <BookOpen size={11} /> Holding
+                          </h5>
+                          <p className="text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            {c.holding || 'Not available'}
+                          </p>
+                        </div>
+
+                        {/* Ratio Decidendi */}
+                        <div className="mb-4">
+                          <h5 className="text-[9px] font-bold text-orange-500 uppercase tracking-widest mb-2">Ratio Decidendi</h5>
+                          <p className="text-sm text-slate-600 leading-relaxed italic border-l-2 border-orange-300 pl-4">
+                            {c.ratio_decidendi || 'Not available'}
+                          </p>
+                        </div>
+
+                        {/* Bottom Tags */}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {c.crime_charges && c.crime_charges !== 'N/A' && (
+                            <span className="text-[9px] font-bold px-2.5 py-1 rounded-md bg-blue-50 text-blue-600 border border-blue-100">{c.crime_charges}</span>
+                          )}
+                          {c.sentence_duration && c.sentence_duration !== 'N/A' && (
+                            <span className="text-[9px] font-bold px-2.5 py-1 rounded-md bg-red-50 text-red-600 border border-red-100">{c.sentence_duration}</span>
+                          )}
+                          {c.coram && c.coram !== 'Unknown' && (
+                            <span className="text-[9px] font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 border border-slate-200">Coram: {c.coram}</span>
+                          )}
+                        </div>
+
+                        {/* Expand/Collapse Toggle */}
+                        <button
+                          onClick={() => toggleCard(idx)}
+                          className="w-full flex items-center justify-center gap-2 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-orange-600 transition-colors border-t border-slate-100 mt-2"
+                        >
+                          {isExpanded ? 'Collapse Details' : 'Expand — Obiter Dicta, Dissent, Precedents'}
+                          <ChevronDown size={14} className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {/* Expanded Section */}
+                        <AnimatePresence>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.3 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pt-4 space-y-4 border-t border-slate-100 mt-2">
+                                {c.obiter_dicta && c.obiter_dicta !== 'Not found' && (
+                                  <div>
+                                    <h5 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">Obiter Dicta</h5>
+                                    <p className="text-sm text-slate-500 leading-relaxed">{c.obiter_dicta}</p>
+                                  </div>
+                                )}
+                                {c.dissenting_opinion && c.dissenting_opinion !== 'None' && (
+                                  <div>
+                                    <h5 className="text-[9px] font-bold text-purple-500 uppercase tracking-widest mb-2">Dissenting Opinion</h5>
+                                    <p className="text-sm text-slate-500 leading-relaxed">{c.dissenting_opinion}</p>
+                                  </div>
+                                )}
+                                {c.cited_precedents && c.cited_precedents.length > 0 && (
+                                  <div>
+                                    <h5 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">Cited Precedents</h5>
+                                    <div className="flex flex-wrap gap-2">
+                                      {c.cited_precedents.map((p, pidx) => (
+                                        <span key={pidx} className="text-[10px] font-semibold px-3 py-1 rounded-full bg-orange-50 text-orange-700 border border-orange-100">{p}</span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </motion.div>
             )}
           </AnimatePresence>

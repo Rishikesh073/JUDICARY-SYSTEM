@@ -6,7 +6,7 @@ import ResearcherPanel from '../components/ResearcherPanel';
 import SummarizerPanel from '../components/SummarizerPanel';
 import CriticPanel from '../components/CriticPanel';
 import CitationGraph from '../components/CitationGraph';
-import { motion } from 'framer-motion';
+import PageTransition from '../components/PageTransition';
 
 const ResearchPage = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -102,41 +102,38 @@ const ResearchPage = () => {
     };
 
     return (
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="min-h-screen bg-slate-50"
-        >
-            <Navbar />
-            <main className="pt-24 px-6 lg:px-12 max-w-7xl mx-auto py-8">
-                <div className="flex flex-col gap-6">
-                    <ChatInterface onSearch={handleSearch} isLoading={isLoading} />
-                    
-                    {error && (
-                        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm text-center">
-                            {error}
-                        </div>
-                    )}
-                    
-                    {/* Agent Status Log */}
-                    {(agentStatuses.researcher !== 'waiting' || isLoading) && (
-                        <AgentLog statuses={agentStatuses} />
-                    )}
+        <PageTransition>
+            <div className="min-h-screen bg-slate-50">
+                <Navbar />
+                <main className="pt-24 px-6 lg:px-12 max-w-7xl mx-auto py-8">
+                    <div className="flex flex-col gap-6">
+                        <ChatInterface onSearch={handleSearch} isLoading={isLoading} />
+                        
+                        {error && (
+                            <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm text-center">
+                                {error}
+                            </div>
+                        )}
+                        
+                        {/* Agent Status Log */}
+                        {(agentStatuses.researcher !== 'waiting' || isLoading) && (
+                            <AgentLog statuses={agentStatuses} />
+                        )}
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div className="space-y-6">
-                            {cases && <ResearcherPanel cases={cases} />}
-                            {summarizedCases && <SummarizerPanel cases={summarizedCases} />}
-                            {evaluatedCases && <CriticPanel cases={evaluatedCases} />}
-                        </div>
-                        <div className="space-y-6">
-                            {evaluatedCases && <CitationGraph cases={evaluatedCases} query={currentQuery} />}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="space-y-6">
+                                {cases && <ResearcherPanel cases={cases} />}
+                                {summarizedCases && <SummarizerPanel cases={summarizedCases} />}
+                                {evaluatedCases && <CriticPanel cases={evaluatedCases} />}
+                            </div>
+                            <div className="space-y-6">
+                                {evaluatedCases && <CitationGraph cases={evaluatedCases} query={currentQuery} />}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </main>
-        </motion.div>
+                </main>
+            </div>
+        </PageTransition>
     );
 };
 

@@ -17,7 +17,10 @@ def run_summarizer(cases: list):
         "bench_strength": "Number of judges",
         "date_of_judgment": "Exact date",
         "coram": "Names of judges",
-        "cited_precedents": ["List of all cases cited"]
+        "cited_precedents": ["List of all cases cited"],
+        "crime_charges": "Specific criminal charges or sections invoked (e.g. 'IPC Section 420', 'PMLA Section 3', 'BNS Section 318'). If none, 'N/A'",
+        "sentence_duration": "The prison sentence or penalty imposed (e.g. '7 years rigorous imprisonment', 'Life imprisonment', 'Fine of Rs. 5 Lakhs'). If not applicable (e.g. bail case), 'N/A'",
+        "special_case_flag": "Is this a landmark, rarest-of-rare, constitutional bench, death penalty, or otherwise exceptional case? Answer 'Yes - [reason]' or 'No'"
 
         Do not include markdown blocks or any other text.
         
@@ -35,7 +38,24 @@ def run_summarizer(cases: list):
             if cleaned.endswith("```"):
                 cleaned = cleaned[:-3]
             
-            parsed = json.loads(cleaned.strip())
+            cleaned = cleaned.strip()
+            
+            # Robust cleanup for LLM JSON output errors:
+            # 1. Replace raw newlines within the JSON string (which break json.loads)
+            # but preserve them if they are part of the structural JSON
+            # Actually, most LLMs put newlines for readability.
+            # A better way is to handle the specific "Invalid \escape" error.
+            
+            try:
+                parsed = json.loads(cleaned)
+            except json.JSONDecodeError:
+                # If it fails, try a more aggressive cleanup of backslashes
+                # often LLMs output single backslashes in text which break JSON
+                cleaned_robust = cleaned.replace('\\', '\\\\')
+                # But wait, if they output \u2019, it becomes \\u2019 which is wrong.
+                # Let's try to just fix the most common culprit: raw backslashes in text.
+                parsed = json.loads(cleaned_robust)
+
             case['holding'] = parsed.get("holding", "Not found")
             case['ratio_decidendi'] = parsed.get("ratio_decidendi", "Not found")
             case['obiter_dicta'] = parsed.get("obiter_dicta", "Not found")
@@ -45,6 +65,9 @@ def run_summarizer(cases: list):
             case['coram'] = parsed.get("coram", "Unknown")
             case['cited_precedents'] = parsed.get("cited_precedents", [])
             case['outcome'] = parsed.get("outcome", "See holding")
+            case['crime_charges'] = parsed.get("crime_charges", "N/A")
+            case['sentence_duration'] = parsed.get("sentence_duration", "N/A")
+            case['special_case_flag'] = parsed.get("special_case_flag", "No")
         except Exception as e:
             print(f"[Summarizer] Error parsing JSON for case {case['filename']}: {e}\nResponse was: {response}", flush=True)
             case['holding'] = "Failed to extract holding."
@@ -55,6 +78,9 @@ def run_summarizer(cases: list):
             case['date_of_judgment'] = "Unknown"
             case['coram'] = "Unknown"
             case['cited_precedents'] = []
+            case['crime_charges'] = "N/A"
+            case['sentence_duration'] = "N/A"
+            case['special_case_flag'] = "No"
             
         summarized_cases.append(case)
         

@@ -4,22 +4,19 @@ import Hero from '../components/Hero';
 import LiveWorkspace from '../components/LiveWorkspace';
 import Comparison from '../components/Comparison';
 import Footer from '../components/Footer';
-import { motion } from 'framer-motion';
+import PageTransition from '../components/PageTransition';
 
 const LandingPage = () => {
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="bg-slate-50 min-h-screen text-slate-900"
-    >
-      <Navbar />
-      <Hero />
-      <LiveWorkspace />
-      <Comparison />
-      <Footer />
-    </motion.div>
+    <PageTransition>
+      <div className="bg-slate-50 min-h-screen text-slate-900">
+        <Navbar />
+        <Hero />
+        <LiveWorkspace />
+        <Comparison />
+        <Footer />
+      </div>
+    </PageTransition>
   );
 };
 

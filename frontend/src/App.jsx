@@ -8,6 +8,7 @@ import TeamWorkspace from './pages/TeamWorkspace';
 import ResearchPage from './pages/ResearchPage';
 import VaultPage from './pages/VaultPage';
 import SmartCitations from './pages/SmartCitations';
+import SmartViewPage from './pages/SmartViewPage';
 
 function AnimatedRoutes() {
     const location = useLocation();
@@ -24,6 +25,7 @@ function AnimatedRoutes() {
                 <Route path="/history" element={<MemoHistory />} />
                 <Route path="/citations" element={<SmartCitations />} />
                 <Route path="/team" element={<TeamWorkspace />} />
+                <Route path="/smartview" element={<SmartViewPage />} />
 
                 {/* Bypassing auth: Redirect /auth to dashboard as requested */}
                 <Route path="/auth" element={<Navigate to="/dashboard" replace />} />

@@ -69,3 +69,13 @@ def run_researcher(query: str):
                 "content": doc
             })
     return cases
+
+def get_collection_stats():
+    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "chroma_db")
+    chroma_client = chromadb.PersistentClient(path=db_path)
+    try:
+        collection = chroma_client.get_collection(name="lexagent_precedents")
+        return {"total_precedents": collection.count()}
+    except Exception as e:
+        print(f"[Researcher] Stats error: {e}", flush=True)
+        return {"total_precedents": 0}

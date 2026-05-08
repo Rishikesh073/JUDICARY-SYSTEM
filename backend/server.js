@@ -119,7 +119,7 @@ app.post('/api/ask-lexagent', async (req, res) => {
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
-        
+
         // Ensure Express doesn't buffer
         res.flushHeaders();
 
@@ -145,7 +145,18 @@ app.post('/api/ask-lexagent', async (req, res) => {
     }
 });
 
+// Bridge to get real stats from Python AI
+app.get('/api/dashboard-stats', async (req, res) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/api/stats');
+        res.json(response.data);
+    } catch (error) {
+        console.error("[Express] Stats Error:", error.message);
+        res.status(500).json({ error: "Failed to fetch real-time stats" });
+    }
+});
+
 const PORT = 5001;
 app.listen(PORT, () => {
-    console.log(`🚀 Express bridge running on http://localhost:${PORT}`);
+    console.log(`🚀 Express bridge running on http://127.0.0.1:${PORT}`);
 });
