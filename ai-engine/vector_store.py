@@ -62,6 +62,9 @@ def populate_vector_db(json_file):
         return "general"
 
     for index, case in enumerate(cases, 1):
+        if index % 100 == 0:
+            print(f"   ⚙️  [Chunking] {index}/{len(cases)} cases processed...")
+            
         text = case['content']
         chunks = legal_chunker(text)
 
@@ -136,4 +139,11 @@ def populate_vector_db(json_file):
     print("\nVector Database fully populated and ready for queries!")
 
 if __name__ == "__main__":
-    populate_vector_db('extracted_cases_with_urls.json')
+    # Use the master dataset which includes 1950-2025
+    master_file = 'master_judicial_dataset.json'
+    
+    if not os.path.exists(master_file):
+        print(f"⚠️  {master_file} not found. Falling back to pilot data...")
+        master_file = 'extracted_cases_with_urls.json'
+        
+    populate_vector_db(master_file)
