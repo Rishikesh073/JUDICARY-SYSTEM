@@ -5,7 +5,7 @@ from chromadb.utils import embedding_functions
 from langchain_ollama import OllamaLLM
 
 def run_researcher(query: str):
-    print(f"[Researcher] Scanning vector database for: '{query}'")
+    print(f"[Researcher] Scanning vector database for: '{query}'", flush=True)
     
     # 1. Extract filters from query using LLM
     llm = OllamaLLM(model="llama3.2")
@@ -29,9 +29,9 @@ def run_researcher(query: str):
         elif "```" in raw_filters:
             raw_filters = raw_filters.split("```")[1].strip()
         metadata_filters = json.loads(raw_filters)
-        print(f"[Researcher] Applying filters: {metadata_filters}")
+        print(f"[Researcher] Applying filters: {metadata_filters}", flush=True)
     except Exception as e:
-        print(f"[Researcher] Filter extraction failed: {e}")
+        print(f"[Researcher] Filter extraction failed: {e}", flush=True)
 
     db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "chroma_db")
     chroma_client = chromadb.PersistentClient(path=db_path)
@@ -47,7 +47,12 @@ def run_researcher(query: str):
         "n_results": 3
     }
     if metadata_filters:
-        query_args["where"] = metadata_filters
+        if len(metadata_filters) == 1:
+            query_args["where"] = metadata_filters
+        elif len(metadata_filters) > 1:
+            query_args["where"] = {
+                "$and": [{k: v} for k, v in metadata_filters.items()]
+            }
 
     results = collection.query(**query_args)
 

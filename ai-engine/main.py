@@ -17,21 +17,21 @@ async def orchestrate_agents(query: str):
         # 1. Researcher
         yield f"data: {json.dumps({'type': 'status', 'agent': 'researcher', 'status': 'running'})}\n\n"
         await asyncio.sleep(0.1)
-        cases = run_researcher(query)
+        cases = await asyncio.to_thread(run_researcher, query)
         yield f"data: {json.dumps({'type': 'payload', 'agent': 'researcher', 'data': cases})}\n\n"
         yield f"data: {json.dumps({'type': 'status', 'agent': 'researcher', 'status': 'complete'})}\n\n"
         
         # 2. Summarizer
         yield f"data: {json.dumps({'type': 'status', 'agent': 'summarizer', 'status': 'running'})}\n\n"
         await asyncio.sleep(0.1)
-        summarized_cases = run_summarizer(cases)
+        summarized_cases = await asyncio.to_thread(run_summarizer, cases)
         yield f"data: {json.dumps({'type': 'payload', 'agent': 'summarizer', 'data': summarized_cases})}\n\n"
         yield f"data: {json.dumps({'type': 'status', 'agent': 'summarizer', 'status': 'complete'})}\n\n"
         
         # 3. Critic
         yield f"data: {json.dumps({'type': 'status', 'agent': 'critic', 'status': 'running'})}\n\n"
         await asyncio.sleep(0.1)
-        evaluated_cases = run_critic(summarized_cases, query)
+        evaluated_cases = await asyncio.to_thread(run_critic, summarized_cases, query)
         yield f"data: {json.dumps({'type': 'payload', 'agent': 'critic', 'data': evaluated_cases})}\n\n"
         yield f"data: {json.dumps({'type': 'status', 'agent': 'critic', 'status': 'complete'})}\n\n"
         

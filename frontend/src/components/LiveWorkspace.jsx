@@ -4,6 +4,8 @@ import { Search, Loader2, CheckCircle2, FileText, Download, ExternalLink } from 
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 
+import CitationGraph from './CitationGraph';
+
 const STEPS = [
   { id: 1, label: 'Intent parsed' },
   { id: 2, label: '50 cases found' },
@@ -17,6 +19,7 @@ const LiveWorkspace = () => {
   const [isResearching, setIsResearching] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [memo, setMemo] = useState(null);
+  const [cases, setCases] = useState([]);
   const [error, setError] = useState(null);
 
   const downloadMemo = () => {
@@ -48,6 +51,7 @@ const LiveWorkspace = () => {
     setIsResearching(true);
     setCurrentStep(1);
     setMemo(null);
+    setCases([]);
     setError(null);
 
     try {
@@ -63,6 +67,7 @@ const LiveWorkspace = () => {
       const decoder = new TextDecoder("utf-8");
       let buffer = "";
       let finalMemoContent = "";
+      let finalCases = [];
 
       while (true) {
         const { value, done } = await reader.read();
@@ -78,12 +83,15 @@ const LiveWorkspace = () => {
               const data = JSON.parse(line.substring(6));
               if (data.type === 'error') {
                 throw new Error(data.message);
-              } else if (data.type === 'status' && data.status === 'complete') {
-                if (data.agent === 'researcher') setCurrentStep(2);
-                if (data.agent === 'summarizer') setCurrentStep(3);
-                if (data.agent === 'critic') setCurrentStep(4);
+              } else if (data.type === 'status') {
+                if (data.status === 'running') {
+                    if (data.agent === 'researcher') setCurrentStep(2);
+                    if (data.agent === 'summarizer') setCurrentStep(3);
+                    if (data.agent === 'critic') setCurrentStep(4);
+                }
               } else if (data.type === 'payload' && data.agent === 'critic') {
                 const evaluatedCases = data.data;
+                finalCases = evaluatedCases;
                 finalMemoContent = evaluatedCases.map((c, i) => 
                   `### Case ${i+1}: ${c.filename}\n**Verdict:** ${c.verdict} (Confidence: ${c.confidence_score}%)\n\n**Holding:**\n${c.holding}\n\n**Ratio Decidendi:**\n${c.ratio_decidendi}\n`
                 ).join('\n---\n\n');
@@ -99,6 +107,7 @@ const LiveWorkspace = () => {
       }
 
       setCurrentStep(5);
+      setCases(finalCases);
       setMemo({ query: query, memo: finalMemoContent || "No relevant cases found." });
 
     } catch (err) {
@@ -170,6 +179,13 @@ const LiveWorkspace = () => {
                   </span>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Citation Graph */}
+          {cases.length > 0 && (
+            <div className="mb-12">
+              <CitationGraph cases={cases} query={query} />
             </div>
           )}
 

@@ -30,8 +30,8 @@ def populate_vector_db(json_file):
 
     def legal_chunker(text):
         # Look for common legal section headers and paragraph markers
-        boundaries = [r"(?i)Held:", r"(?i)Ratio Decidendi:", r"(?i)Obiter Dicta:", r"(?i)Obiter:", r"(?i)Per Curiam:", r"\n\d+\.", r"\n\(\d+\)"]
-        pattern = "(" + "|".join(boundaries) + ")"
+        boundaries = [r"Held:", r"Ratio Decidendi:", r"Obiter Dicta:", r"Obiter:", r"Per Curiam:", r"\n\d+\.", r"\n\(\d+\)"]
+        pattern = "(?i)(" + "|".join(boundaries) + ")"
         parts = re.split(pattern, text)
         chunks = []
         current_chunk = ""
@@ -145,8 +145,8 @@ def populate_vector_db(json_file):
             metadatas=metadatas[i:i+batch_size],
             ids=ids[i:i+batch_size]
         )
-        print(f"💾 Vectorized batch {i} to {i + len(documents[i:i+batch_size])}...")
+        print(f"Vectorized batch {i} to {i + len(documents[i:i+batch_size])}...")
 
-    print("\n🚀 Vector Database fully populated and ready for queries!")
+    print("\nVector Database fully populated and ready for queries!")
 
 populate_vector_db('extracted_cases_with_urls.json')

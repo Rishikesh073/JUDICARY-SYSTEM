@@ -2,7 +2,7 @@ import json
 from langchain_ollama import OllamaLLM
 
 def run_summarizer(cases: list):
-    print("[Summarizer] Extracting holding and ratio for each case...")
+    print("[Summarizer] Extracting holding and ratio for each case...", flush=True)
     llm = OllamaLLM(model="llama3.2")
     
     summarized_cases = []
@@ -46,7 +46,7 @@ def run_summarizer(cases: list):
             case['cited_precedents'] = parsed.get("cited_precedents", [])
             case['outcome'] = parsed.get("outcome", "See holding")
         except Exception as e:
-            print(f"[Summarizer] Error parsing JSON for case {case['filename']}: {e}\nResponse was: {response}")
+            print(f"[Summarizer] Error parsing JSON for case {case['filename']}: {e}\nResponse was: {response}", flush=True)
             case['holding'] = "Failed to extract holding."
             case['ratio_decidendi'] = "Failed to extract ratio."
             case['obiter_dicta'] = "Failed to extract obiter."
