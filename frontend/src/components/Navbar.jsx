@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Shield, ChevronDown, Sparkles, Database, FileText, Search, History, Users } from 'lucide-react';
+import { Shield, ChevronDown, Search, Database, FileText, History, X, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useResearch } from '../context/ResearchContext';
 
 const Navbar = () => {
   const [isFeaturesOpen, setIsFeaturesOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { isResearching, abortResearch, query } = useResearch();
 
   const features = [
     { name: 'Semantic Search', desc: 'Context-aware precedent retrieval', icon: Search, path: '/research' },
@@ -85,8 +87,29 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* CTA */}
-        <div className="flex items-center gap-4">
+        {/* CTA + Abort */}
+        <div className="flex items-center gap-3">
+          {/* Abort button — visible on ALL pages while research is running */}
+          <AnimatePresence>
+            {isResearching && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.85, x: 10 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.85, x: 10 }}
+                transition={{ duration: 0.2 }}
+                onClick={abortResearch}
+                title={`Abort: "${query.substring(0, 40)}..."`}
+                className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-red-100 transition-all"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                </span>
+                Research Active
+                <X size={12} />
+              </motion.button>
+            )}
+          </AnimatePresence>
           <Link to="/dashboard" className="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm">
             Get started free
           </Link>

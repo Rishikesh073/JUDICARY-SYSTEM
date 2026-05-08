@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Loader2, CheckCircle2, FileText, Download, ExternalLink, ChevronDown, Eye, Scale, Gavel, Users, Clock, AlertTriangle, BookOpen } from 'lucide-react';
+import { Search, Loader2, CheckCircle2, FileText, Download, Eye, Gavel, AlertTriangle, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { jsPDF } from 'jspdf';
 
+import { useResearch } from '../context/ResearchContext';
 import { AgentOrchestrator } from './AgentOrchestrator';
 import CitationGraph from './CitationGraph';
 
@@ -17,133 +17,51 @@ const verdictConfig = {
 
 const LiveWorkspace = () => {
   const navigate = useNavigate();
-  const [query, setQuery] = useState('');
-  const [isResearching, setIsResearching] = useState(false);
 
-  const [memo, setMemo] = useState(null);
-  const [cases, setCases] = useState([]);
-  const [error, setError] = useState(null);
-  const [queryTip, setQueryTip] = useState("Tip: Start with a specific legal question or case type.");
+  // All research state lives in the global context — survives navigation
+  const {
+    query, setQuery,
+    isResearching,
+    memo,
+    cases,
+    error,
+    agentStatuses,
+    telemetry,
+    handleResearch,
+  } = useResearch();
+
+  const [queryTip, setQueryTip] = useState('Tip: Start with a specific legal question or case type.');
 
   useEffect(() => {
     if (!query) {
-      setQueryTip("Tip: Start with a specific legal question or case type.");
+      setQueryTip('Tip: Start with a specific legal question or case type.');
     } else if (query.length < 15) {
       setQueryTip("Query is a bit broad. Try adding a specific Act (e.g., 'IPC') or issue (e.g., 'bail').");
     } else if (!/(supreme|high|court|district)/i.test(query)) {
-      setQueryTip("Tip: Mentioning a specific Court helps narrow down jurisdiction.");
+      setQueryTip('Tip: Mentioning a specific Court helps narrow down jurisdiction.');
     } else if (!/\d{4}/.test(query)) {
       setQueryTip("Tip: Adding a year (e.g. 'after 2020') helps filter recent precedents.");
     } else {
-      setQueryTip("Excellent query context. Ready for deep research.");
+      setQueryTip('Excellent query context. Ready for deep research.');
     }
   }, [query]);
 
   const downloadMemo = () => {
     if (!memo) return;
     const doc = new jsPDF();
-    
     doc.setFontSize(22);
     doc.setTextColor(217, 119, 6);
-    doc.text("LEXAGENT — LEGAL MEMORANDUM", 10, 20);
-    
+    doc.text('LEXAGENT — LEGAL MEMORANDUM', 10, 20);
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.text(`Query: ${memo.query}`, 10, 30);
     doc.text(`Generated on: ${new Date().toLocaleString()}`, 10, 35);
     doc.line(10, 40, 200, 40);
-
     doc.setFontSize(12);
     doc.setTextColor(0);
     const splitText = doc.splitTextToSize(memo.query, 180);
     doc.text(splitText, 10, 50);
-    
     doc.save(`lexagent_memo_${memo.query.substring(0, 20)}.pdf`);
-  };
-
-  const [agentStatuses, setAgentStatuses] = useState({
-    intent: 'idle',
-    researcher: 'idle',
-    validation: 'idle',
-    analysis: 'idle',
-    memorandum: 'idle'
-  });
-  const [telemetry, setTelemetry] = useState([]);
-
-  const handleResearch = async () => {
-    if (!query) return;
-    setIsResearching(true);
-    setAgentStatuses({
-      intent: 'idle',
-      researcher: 'idle',
-      validation: 'idle',
-      analysis: 'idle',
-      memorandum: 'idle'
-    });
-    setTelemetry([]);
-    setMemo(null);
-    setCases([]);
-    setError(null);
-
-    try {
-      const response = await fetch('http://localhost:5001/api/ask-lexagent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query })
-      });
-
-      if (!response.body) throw new Error("ReadableStream not supported.");
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder("utf-8");
-      let buffer = "";
-      let sessionCases = [];
-
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n\n');
-        buffer = lines.pop();
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const data = JSON.parse(line.substring(6));
-              if (data.type === 'error') {
-                throw new Error(data.message);
-              } else if (data.type === 'status') {
-                setAgentStatuses(prev => ({
-                    ...prev,
-                    [data.agent]: data.status
-                }));
-              } else if (data.type === 'telemetry') {
-                setTelemetry(prev => [{
-                    id: Date.now() + Math.random(),
-                    timestamp: new Date().toLocaleTimeString([], { hour12: false }),
-                    agent: data.agent,
-                    message: data.message
-                }, ...prev].slice(0, 50));
-              } else if (data.type === 'payload' && data.agent === 'critic') {
-                sessionCases = data.data;
-                setCases(sessionCases);
-              }
-            } catch (e) {
-              console.error("Error parsing stream line:", e);
-            }
-          }
-        }
-      }
-
-      setMemo({ query: query, cases: sessionCases });
-
-    } catch (err) {
-      setError("Engine connection failed. Please ensure the backend is running.");
-      console.error(err);
-    } finally {
-      setIsResearching(false);
-    }
   };
 
   return (

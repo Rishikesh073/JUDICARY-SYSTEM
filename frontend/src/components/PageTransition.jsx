@@ -4,14 +4,12 @@ import { motion } from 'framer-motion';
 const PageTransition = ({ children }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ 
-        type: 'spring', 
-        stiffness: 260, 
-        damping: 20,
-        duration: 0.5 
+        type: 'tween',
+        ease: 'easeOut',
+        duration: 0.25
       }}
       className="w-full"
     >
