@@ -111,13 +111,9 @@ def _extract_filters_from_query(query):
     return filters
 
 def run_researcher(query: str):
-<<<<<<< HEAD
-    print(f"[Researcher] Scanning vector database for: '{query}'", flush=True)
-=======
     print(f"[Researcher] Scanning vector database for: '{query}'")
 
     metadata_filters = _extract_filters_from_query(query)
->>>>>>> 33cd273 (feat: upgrade legal research pipeline with structured chunking, interactive memo UI, and project-local skills)
     
     # 1. Extract filters from query using LLM
     llm = OllamaLLM(model="llama3.2")
@@ -139,14 +135,9 @@ def run_researcher(query: str):
             raw_filters = raw_filters.split("```json")[1].split("```")[0].strip()
         elif "```" in raw_filters:
             raw_filters = raw_filters.split("```")[1].strip()
-<<<<<<< HEAD
-        metadata_filters = json.loads(raw_filters)
-        print(f"[Researcher] Applying filters: {metadata_filters}", flush=True)
-=======
         llm_filters = json.loads(raw_filters)
         metadata_filters.update({k: v for k, v in llm_filters.items() if v and k not in metadata_filters})
         print(f"[Researcher] Applying filters: {metadata_filters}")
->>>>>>> 33cd273 (feat: upgrade legal research pipeline with structured chunking, interactive memo UI, and project-local skills)
     except Exception as e:
         print(f"[Researcher] Filter extraction failed: {e}", flush=True)
 
@@ -166,18 +157,8 @@ def run_researcher(query: str):
         "query_texts": [query],
         "n_results": 10
     }
-<<<<<<< HEAD
-    if metadata_filters:
-        if len(metadata_filters) == 1:
-            query_args["where"] = metadata_filters
-        elif len(metadata_filters) > 1:
-            query_args["where"] = {
-                "$and": [{k: v} for k, v in metadata_filters.items()]
-            }
-=======
     if where_clause:
         query_args["where"] = where_clause
->>>>>>> 33cd273 (feat: upgrade legal research pipeline with structured chunking, interactive memo UI, and project-local skills)
 
     try:
         results = collection.query(**query_args)
@@ -209,6 +190,7 @@ def run_researcher(query: str):
                 "source_link": meta.get('source_link', '#'),
                 "content": doc
             })
+
     return cases
 
 def get_collection_stats():
