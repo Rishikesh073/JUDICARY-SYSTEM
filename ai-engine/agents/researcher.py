@@ -110,12 +110,10 @@ def _extract_filters_from_query(query):
 
     return filters
 
-def run_researcher(query: str):
-    print(f"[Researcher] Scanning vector database for: '{query}'")
-
+def extract_metadata(query: str):
+    """Phase 1: Intent Agent - Extract filters from query."""
     metadata_filters = _extract_filters_from_query(query)
     
-    # 1. Extract filters from query using LLM
     llm = OllamaLLM(model="llama3.2")
     filter_prompt = f"""You are a legal metadata extractor. Extract ChromaDB filters from the query.
     Query: "{query}"
@@ -137,14 +135,14 @@ def run_researcher(query: str):
             raw_filters = raw_filters.split("```")[1].strip()
         llm_filters = json.loads(raw_filters)
         metadata_filters.update({k: v for k, v in llm_filters.items() if v and k not in metadata_filters})
-        print(f"[Researcher] Applying filters: {metadata_filters}")
     except Exception as e:
         print(f"[Researcher] Filter extraction failed: {e}", flush=True)
+        
+    return metadata_filters
 
+def query_collection(query: str, metadata_filters: dict):
+    """Phase 2: Research Agent - Scan vector database."""
     where_clause = _build_where_clause(metadata_filters)
-    if where_clause:
-        print(f"[Researcher] Built Chroma where clause: {where_clause}")
-
     db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "chroma_db")
     chroma_client = chromadb.PersistentClient(path=db_path)
     sentence_transformer_ef = embedding_functions.DefaultEmbeddingFunction()
@@ -163,16 +161,19 @@ def run_researcher(query: str):
     try:
         results = collection.query(**query_args)
     except Exception as e:
-        print(f"[Researcher] Filtered query failed: {e}. Retrying without filters.")
         results = collection.query(query_texts=[query], n_results=10)
+        
+    return results
 
+def format_results(results, metadata_filters):
+    """Phase 2 (cont): Research Agent - Filter and format results."""
     cases = []
     if results['documents'] and len(results['documents']) > 0:
         for i in range(len(results['documents'][0])):
             doc = results['documents'][0][i]
             meta = results['metadatas'][0][i]
 
-            # Secondary safeguard for loose year filters stored as strings.
+            # Year Agent Logic
             year_filter = metadata_filters.get("year")
             if isinstance(year_filter, str):
                 lower_match = re.search(r"(?i)after\s+(\d{4})", year_filter)
@@ -190,8 +191,13 @@ def run_researcher(query: str):
                 "source_link": meta.get('source_link', '#'),
                 "content": doc
             })
-
     return cases
+
+def run_researcher(query: str):
+    """Legacy wrapper for backward compatibility."""
+    metadata = extract_metadata(query)
+    results = query_collection(query, metadata)
+    return format_results(results, metadata)
 
 def get_collection_stats():
     db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "chroma_db")

@@ -5,15 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 
+import { AgentOrchestrator } from './AgentOrchestrator';
 import CitationGraph from './CitationGraph';
 
-const STEPS = [
-  { id: 1, label: 'Intent parsed' },
-  { id: 2, label: '50 cases found' },
-  { id: 3, label: 'NLP pipeline' },
-  { id: 4, label: 'Filtered' },
-  { id: 5, label: 'Memo ready' },
-];
 
 const verdictConfig = {
   Approved: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', accent: 'bg-emerald-500', label: 'Approved' },
@@ -25,7 +19,7 @@ const LiveWorkspace = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [isResearching, setIsResearching] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
+
   const [memo, setMemo] = useState(null);
   const [cases, setCases] = useState([]);
   const [error, setError] = useState(null);
@@ -67,10 +61,26 @@ const LiveWorkspace = () => {
     doc.save(`lexagent_memo_${memo.query.substring(0, 20)}.pdf`);
   };
 
+  const [agentStatuses, setAgentStatuses] = useState({
+    intent: 'idle',
+    researcher: 'idle',
+    validation: 'idle',
+    analysis: 'idle',
+    memorandum: 'idle'
+  });
+  const [telemetry, setTelemetry] = useState([]);
+
   const handleResearch = async () => {
     if (!query) return;
     setIsResearching(true);
-    setCurrentStep(1);
+    setAgentStatuses({
+      intent: 'idle',
+      researcher: 'idle',
+      validation: 'idle',
+      analysis: 'idle',
+      memorandum: 'idle'
+    });
+    setTelemetry([]);
     setMemo(null);
     setCases([]);
     setError(null);
@@ -104,11 +114,17 @@ const LiveWorkspace = () => {
               if (data.type === 'error') {
                 throw new Error(data.message);
               } else if (data.type === 'status') {
-                if (data.status === 'running') {
-                    if (data.agent === 'researcher') setCurrentStep(2);
-                    if (data.agent === 'summarizer') setCurrentStep(3);
-                    if (data.agent === 'critic') setCurrentStep(4);
-                }
+                setAgentStatuses(prev => ({
+                    ...prev,
+                    [data.agent]: data.status
+                }));
+              } else if (data.type === 'telemetry') {
+                setTelemetry(prev => [{
+                    id: Date.now() + Math.random(),
+                    timestamp: new Date().toLocaleTimeString([], { hour12: false }),
+                    agent: data.agent,
+                    message: data.message
+                }, ...prev].slice(0, 50));
               } else if (data.type === 'payload' && data.agent === 'critic') {
                 sessionCases = data.data;
                 setCases(sessionCases);
@@ -120,7 +136,6 @@ const LiveWorkspace = () => {
         }
       }
 
-      setCurrentStep(5);
       setMemo({ query: query, cases: sessionCases });
 
     } catch (err) {
@@ -128,7 +143,6 @@ const LiveWorkspace = () => {
       console.error(err);
     } finally {
       setIsResearching(false);
-      setTimeout(() => setCurrentStep(0), 3000);
     }
   };
 
@@ -178,28 +192,7 @@ const LiveWorkspace = () => {
           </div>
 
           {(isResearching || memo) && (
-            <div className="relative flex justify-between items-center mb-16 max-w-3xl mx-auto mt-12">
-              <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 -z-10 -translate-y-1/2" />
-              <motion.div 
-                className="absolute top-1/2 left-0 h-0.5 bg-orange-600 -z-10 -translate-y-1/2"
-                initial={{ width: 0 }}
-                animate={{ width: `${(Math.max(0, currentStep - 1) / (STEPS.length - 1)) * 100}%` }}
-              />
-              {STEPS.map((step, idx) => (
-                <div key={step.id} className="flex flex-col items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold transition-all border-2 ${
-                    currentStep > idx + 1 ? 'bg-orange-600 border-orange-600 text-white' : 
-                    currentStep === idx + 1 ? 'bg-white border-orange-600 text-orange-600 shadow-sm' :
-                    'bg-white border-slate-300 text-slate-400'
-                  }`}>
-                    {currentStep > idx + 1 ? <CheckCircle2 size={14} /> : step.id}
-                  </div>
-                  <span className={`text-[10px] font-bold uppercase tracking-widest ${currentStep === idx + 1 ? 'text-orange-500' : 'text-slate-600'}`}>
-                    {step.label}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <AgentOrchestrator statuses={agentStatuses} telemetry={telemetry} />
           )}
 
           {cases.length > 0 && (
