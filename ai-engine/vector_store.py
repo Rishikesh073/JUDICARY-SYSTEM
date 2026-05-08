@@ -2,15 +2,18 @@ import json
 import os
 import chromadb
 from chromadb.utils import embedding_functions
+import re
 
 def populate_vector_db(json_file):
     print("Initializing persistent local ChromaDB...")
-    # This creates a local folder to save the DB permanently so you don't have to re-embed on restart
     db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chroma_db")
     chroma_client = chromadb.PersistentClient(path=db_path)
-
-    # Chroma's default embedding model runs locally and is incredibly fast
     sentence_transformer_ef = embedding_functions.DefaultEmbeddingFunction()
+
+    try:
+        chroma_client.delete_collection(name="lexagent_precedents")
+    except Exception:
+        pass
 
     collection = chroma_client.get_or_create_collection(
         name="lexagent_precedents",
@@ -26,20 +29,16 @@ def populate_vector_db(json_file):
 
     print(f"Chunking {len(cases)} cases for vectorization. This will take a few minutes...")
 
-    import re
-
     def legal_chunker(text):
-        # Look for common legal section headers and paragraph markers
         boundaries = [r"Held:", r"Ratio Decidendi:", r"Obiter Dicta:", r"Obiter:", r"Per Curiam:", r"\n\d+\.", r"\n\(\d+\)"]
-        pattern = "(?i)(" + "|".join(boundaries) + ")"
-        parts = re.split(pattern, text)
+        pattern = "(" + "|".join(boundaries) + ")"
+        parts = re.split(pattern, text, flags=re.IGNORECASE)
         chunks = []
         current_chunk = ""
         for part in parts:
             if not part:
                 continue
-            # If this part is a boundary header, start a new chunk
-            if re.match(pattern, part):
+            if re.match(pattern, part, flags=re.IGNORECASE):
                 if current_chunk:
                     chunks.append(current_chunk.strip())
                 current_chunk = part
@@ -66,15 +65,13 @@ def populate_vector_db(json_file):
         text = case['content']
         chunks = legal_chunker(text)
 
-        # Base metadata for the case (normalize keys used by downstream filters)
-        # Try to pull explicit fields from the case dict first
         case_number = case.get('case_number') or case.get('case_no') or case.get('caseNo') or case.get('caseId') or case.get('caseno')
-        # Year fallback
-        year = str(case.get('year', '2025'))
-        # Source link
+        try:
+            year = int(case.get('year', 2025))
+        except Exception:
+            year = 2025
         source_link = case.get('cloudinary_url') or case.get('source_link') or case.get('url') or 'URL_NOT_FOUND'
 
-        # Normalize court: prefer explicit field, else detect from text
         raw_court = case.get('court')
         if raw_court:
             court = raw_court
@@ -82,13 +79,11 @@ def populate_vector_db(json_file):
             if re.search(r'(?i)supreme court', text[:5000]):
                 court = 'Supreme Court of India'
             elif re.search(r'(?i)high court', text[:5000]):
-                # try to capture which High Court if present
                 m = re.search(r'([A-Z][a-z]+ High Court)', text[:2000])
                 court = m.group(1) if m else 'High Court'
             else:
                 court = 'Unknown'
 
-        # Try to extract a judgment date from explicit fields or the top of the text
         date_of_judgment = case.get('date') or case.get('judgment_date') or case.get('date_of_judgment') or case.get('judgmentDate')
         if not date_of_judgment:
             header = text[:1200]
@@ -110,7 +105,6 @@ def populate_vector_db(json_file):
             "jurisdiction": case.get('jurisdiction', 'India')
         }
 
-        # Detect Act (prefer explicit field)
         if case.get('act'):
             case_meta['act'] = case.get('act')
         else:
@@ -125,19 +119,11 @@ def populate_vector_db(json_file):
 
         for chunk_idx, chunk in enumerate(chunks):
             documents.append(chunk)
-            
-            # Combine case metadata with chunk-specific info
             chunk_meta = case_meta.copy()
             chunk_meta["section_type"] = get_section_type(chunk)
-            # Ensure keys used by researcher filters exist on every chunk
-            chunk_meta.setdefault('case_number', case_meta.get('case_number', 'Unknown'))
-            chunk_meta.setdefault('date_of_judgment', case_meta.get('date_of_judgment', 'Unknown'))
-            chunk_meta.setdefault('act', case_meta.get('act', 'General'))
-
             metadatas.append(chunk_meta)
             ids.append(f"{case.get('filename','unknown')}_chunk_{chunk_idx}")
 
-    # Add to ChromaDB in batches to prevent memory overload
     batch_size = 150
     for i in range(0, len(documents), batch_size):
         collection.add(
@@ -149,4 +135,5 @@ def populate_vector_db(json_file):
 
     print("\nVector Database fully populated and ready for queries!")
 
-populate_vector_db('extracted_cases_with_urls.json')
+if __name__ == "__main__":
+    populate_vector_db('extracted_cases_with_urls.json')

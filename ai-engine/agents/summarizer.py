@@ -7,22 +7,29 @@ def run_summarizer(cases: list):
     
     summarized_cases = []
     for case in cases:
-        prompt = f"""You are an elite legal analyst. Read the following case excerpt and extract precise details.
+        prompt = f"""You are an elite legal analyst preparing a court-grade legal digest.
+        Read the following case excerpt and extract precise details.
         
-        Output your response ONLY as a valid JSON object with the following keys: 
-        "holding": "Full verbatim holding",
-        "ratio_decidendi": "Core legal principle (Ratio Decidendi)",
-        "obiter_dicta": "Incidental remarks (Obiter Dicta)",
-        "dissenting_opinion": "Any dissent found, or 'None'",
-        "bench_strength": "Number of judges",
-        "date_of_judgment": "Exact date",
-        "coram": "Names of judges",
-        "cited_precedents": ["List of all cases cited"],
+        Required keys:
+        "holding": "Full verbatim holding, quoted or as close to verbatim as possible",
+        "ratio_decidendi": "Full ratio decidendi with the legal principle applied by the court",
+        "obiter_dicta": "All obiter dicta or incidental observations; use an empty string if none",
+        "dissenting_opinion": "Full dissenting opinion if present, otherwise 'None'",
+        "bench_strength": "Number of judges on the bench, as a number or string if unclear",
+        "date_of_judgment": "Exact date of judgment as stated in the case text",
+        "coram": "Names of all judges on the bench",
+        "cited_precedents": ["List every cited precedent exactly as named in the text"],
         "crime_charges": "Specific criminal charges or sections invoked (e.g. 'IPC Section 420', 'PMLA Section 3', 'BNS Section 318'). If none, 'N/A'",
         "sentence_duration": "The prison sentence or penalty imposed (e.g. '7 years rigorous imprisonment', 'Life imprisonment', 'Fine of Rs. 5 Lakhs'). If not applicable (e.g. bail case), 'N/A'",
-        "special_case_flag": "Is this a landmark, rarest-of-rare, constitutional bench, death penalty, or otherwise exceptional case? Answer 'Yes - [reason]' or 'No'"
+        "special_case_flag": "Is this a landmark, rarest-of-rare, constitutional bench, death penalty, or otherwise exceptional case? Answer 'Yes - [reason]' or 'No'",
+        "outcome": "Final disposition of the case, such as allowed, dismissed, granted, rejected, remanded, or similar"
 
-        Do not include markdown blocks or any other text.
+        Rules:
+        - Do not summarize loosely when the text contains exact legal language.
+        - Prefer verbatim legal phrasing for holding and ratio.
+        - If a field is not present, use "Not specified" for strings and [] for cited precedents.
+        - Return ONLY a valid JSON object and nothing else.
+        - Do not include markdown fences, commentary, or prose outside the JSON object.
         
         CASE EXCERPT:
         {case['content']}
@@ -40,20 +47,10 @@ def run_summarizer(cases: list):
             
             cleaned = cleaned.strip()
             
-            # Robust cleanup for LLM JSON output errors:
-            # 1. Replace raw newlines within the JSON string (which break json.loads)
-            # but preserve them if they are part of the structural JSON
-            # Actually, most LLMs put newlines for readability.
-            # A better way is to handle the specific "Invalid \escape" error.
-            
             try:
                 parsed = json.loads(cleaned)
             except json.JSONDecodeError:
-                # If it fails, try a more aggressive cleanup of backslashes
-                # often LLMs output single backslashes in text which break JSON
                 cleaned_robust = cleaned.replace('\\', '\\\\')
-                # But wait, if they output \u2019, it becomes \\u2019 which is wrong.
-                # Let's try to just fix the most common culprit: raw backslashes in text.
                 parsed = json.loads(cleaned_robust)
 
             case['holding'] = parsed.get("holding", "Not found")
@@ -81,6 +78,7 @@ def run_summarizer(cases: list):
             case['crime_charges'] = "N/A"
             case['sentence_duration'] = "N/A"
             case['special_case_flag'] = "No"
+            case['outcome'] = "Error"
             
         summarized_cases.append(case)
         
