@@ -22,8 +22,22 @@
 
 ---
 
-### **Technical Summary for Reference:**
-*   **Tech Stack**: React/Vite, Node.js (Express Bridge), Python (FastAPI), ChromaDB, Ollama (Llama 3.2).
-*   **Data Volume**: 37,000+ Full-text Supreme Court Judgments (1950–2025).
-*   **Security**: IPFS for decentralized storage, local LLM execution for sensitive legal data.
-*   **Innovation**: Relational D3.js mapping of citation vectors—showing not just results, but the connections between them.
+## **Part 2: Critical "Counter-Attack" Defense**
+
+### **Q7: Hallucination is the biggest fear in Law. How do you prevent the AI from "inventing" a law?**
+*   **Answer**: "We implement **Source-Grounded Extraction.** Our Summarizer Agent is strictly instructed to extract **Verbatim Holdings**—meaning it must copy-paste the exact legal text from the PDF. Furthermore, the **Critic Agent** performs a cross-check: if the summary contains a legal principle not found in the original text chunk, it rejects the result. We don't ask the AI to 'tell us about the law'; we ask it to 'find and quote the law' from the provided 37,000 files."
+
+### **Q8: Does a user need a supercomputer to run 4 agents locally?**
+*   **Answer**: "No. We use **4-bit Quantization** (GGUF format) for our Llama 3.2 model. This allows the model to fit into ~4GB of VRAM. By orchestrating the agents sequentially (Intent → Research → Summarize → Critic), we manage the compute load so that even a modern consumer laptop can handle the entire research cycle in under 60 seconds. This makes high-end AI accessible to the average Indian law firm."
+
+### **Q9: How do you handle "Data Freshness"? Today's judgment could change everything.**
+*   **Answer**: "Our architecture is **Vector-First.** The `ai-engine` includes a `bulk_uploader.py` utility that can ingest new judgments from official court websites in minutes. Since we use ChromaDB, we don't need to 'retrain' the model. We simply add new vectors to the vault, and the agents immediately have access to the latest law without any downtime."
+
+### **Q10: What if the AI gives a wrong citation? Who is responsible?**
+*   **Answer**: "LexAgent is positioned as a **Research Assistant (Clerk)**, not a Judge. Every result in our UI includes a direct link to the **Original raw PDF** from the local vault. We empower the lawyer to verify the AI's findings in one click. Our Relational Map also shows the 'Selection Reason,' making the AI's logic transparent (White-box AI) rather than a mystery (Black-box AI)."
+
+### **Q11: Can LexAgent handle multi-lingual judgments from regional courts?**
+*   **Answer**: "Currently, we focus on Supreme Court judgments (English). However, because we use Llama 3.2, which is a multi-lingual model, the architecture is 'Language-Agnostic.' We can easily scale to High Court judgments in Hindi, Marathi, or Tamil by simply updating the vector embeddings for those specific languages."
+
+### **Q12: Is the Web3/IPFS part just a 'buzzword' or does it serve a purpose?**
+*   **Answer**: "It is a critical **Security Feature.** Legal research memos are highly sensitive. By pinning them to **IPFS**, we ensure that once a research session is finalized, it is immutable and decentralized. It prevents 'Data Loss' if a local system fails and provides a tamper-proof audit trail for the law firm's internal archives."
