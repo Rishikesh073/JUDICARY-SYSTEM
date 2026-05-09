@@ -8,7 +8,7 @@ const Comparison = () => {
         <div className="text-center mb-16">
           <span className="text-xs uppercase tracking-widest text-orange-600 font-bold mb-4 block">Why LexAgent</span>
           <h2 className="text-4xl md:text-5xl font-serif mb-4 text-slate-900">The old way vs. the right way</h2>
-          <p className="text-slate-600">Manupatra, Westlaw, LexisNexis stop at search. LexAgent thinks.</p>
+          <p className="text-slate-600">Traditional databases give you thousands of results. LexAgent synthesizes them into actionable strategy.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -39,8 +39,8 @@ const Comparison = () => {
               {[
                 'Natural language queries (just ask)',
                 'Instant cross-referencing of 1M+ cases',
-                'Auto-generated court-ready memos',
-                'Over-ruled precedents filtered out',
+                'Comprehensive partner-ready first drafts',
+                'Smart-flagging of negative case treatment',
                 'Collaborative firm-wide memory'
               ].map(item => (
                 <li key={item} className="flex items-start gap-4 text-slate-900 text-sm">

@@ -32,7 +32,7 @@ const Hero = () => {
           transition={{ ...FADE_IN.transition, delay: 0.2 }}
           className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed"
         >
-          Ask a complex legal question. Get a court-ready 2-page memo with verified precedents in under 5 minutes — not 14 hours.
+          Ask a complex legal question. Get a comprehensive, partner-ready foundational memo with strictly verified precedents in under 5 minutes.
         </motion.p>
 
         <motion.div 
@@ -57,16 +57,16 @@ const Hero = () => {
             <span className="text-xs uppercase tracking-widest text-slate-600 font-medium">Research time saved</span>
           </div>
           <div className="flex flex-col items-center gap-1 border-l border-slate-200">
-            <span className="text-3xl font-serif text-slate-900">90%</span>
-            <span className="text-xs uppercase tracking-widest text-slate-600 font-medium">Citation accuracy</span>
+            <span className="text-3xl font-serif text-slate-900">100%</span>
+            <span className="text-xs uppercase tracking-widest text-slate-600 font-medium">Verifiable Citations</span>
           </div>
           <div className="flex flex-col items-center gap-1 border-l border-slate-200">
             <span className="text-3xl font-serif text-slate-900">10+</span>
-            <span className="text-xs uppercase tracking-widest text-slate-600 font-medium">Cases per query</span>
+            <span className="text-xs uppercase tracking-widest text-slate-600 font-medium">Cases synthesized</span>
           </div>
           <div className="flex flex-col items-center gap-1 border-l border-slate-200">
             <span className="text-3xl font-serif text-slate-900">&lt;2min</span>
-            <span className="text-xs uppercase tracking-widest text-slate-600 font-medium">Memo delivery</span>
+            <span className="text-xs uppercase tracking-widest text-slate-600 font-medium">First-draft delivery</span>
           </div>
         </motion.div>
       </div>
