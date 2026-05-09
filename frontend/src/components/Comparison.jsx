@@ -3,7 +3,7 @@ import { X, Check } from 'lucide-react';
 
 const Comparison = () => {
   return (
-    <section className="py-24 px-6 bg-white">
+    <section id="comparison" className="py-24 px-6 bg-white">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <span className="text-xs uppercase tracking-widest text-orange-600 font-bold mb-4 block">Why LexAgent</span>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { FADE_IN } from '../utils/DesignTokens';
 
 const Hero = () => {
@@ -39,10 +40,13 @@ const Hero = () => {
           transition={{ ...FADE_IN.transition, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20"
         >
-          <button className="bg-orange-600 hover:bg-orange-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg shadow-xl shadow-orange-600/30 transition-all hover:scale-105 active:scale-95">
+          <Link to="/research" className="bg-orange-600 hover:bg-orange-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg shadow-xl shadow-orange-600/30 transition-all hover:scale-105 active:scale-95 text-center">
             Start researching — it's free
-          </button>
-          <button className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-900 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg shadow-sm transition-all">
+          </Link>
+          <button 
+            onClick={() => document.getElementById('comparison')?.scrollIntoView({ behavior: 'smooth' })}
+            className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-900 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg shadow-sm transition-all text-center"
+          >
             See how it works
           </button>
         </motion.div>
