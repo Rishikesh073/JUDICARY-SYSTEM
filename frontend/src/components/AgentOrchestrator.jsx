@@ -35,7 +35,7 @@ const AgentNode = ({ agent, status, isLast }) => {
           
           {isRunning && (
              <motion.div 
-               layoutId="pulse"
+               layoutId={`pulse-${agent.id}`}
                className="absolute inset-0 rounded-xl bg-blue-500/20"
                animate={{ scale: [1, 1.25, 1], opacity: [0.8, 0, 0.8] }}
                transition={{ repeat: Infinity, duration: 2 }}

@@ -46,43 +46,47 @@ class SearchQuery(BaseModel):
     query: str
 
 async def orchestrate_agents(query: str):
-    yield f"data: {json.dumps({'agent': 'intent', 'message': f'Analyzing legal intent for: {query}'})}\n\n"
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'intent', 'status': 'running'})}\n\n"
+    yield f"data: {json.dumps({'type': 'telemetry', 'agent': 'intent', 'message': f'Analyzing legal intent for: {query}'})}\n\n"
     await asyncio.sleep(1)
     metadata = await asyncio.to_thread(extract_metadata, query)
-    yield f"data: {json.dumps({'agent': 'intent', 'message': 'Filters identified.', 'data': metadata})}\n\n"
+    yield f"data: {json.dumps({'type': 'telemetry', 'agent': 'intent', 'message': 'Filters identified.', 'data': metadata})}\n\n"
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'intent', 'status': 'complete'})}\n\n"
 
-    yield f"data: {json.dumps({'agent': 'researcher', 'message': 'Scanning 75-year judicial vault...'})}\n\n"
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'researcher', 'status': 'running'})}\n\n"
+    yield f"data: {json.dumps({'type': 'telemetry', 'agent': 'researcher', 'message': 'Scanning 75-year judicial vault...'})}\n\n"
     await asyncio.sleep(1)
     raw_results = await asyncio.to_thread(query_collection, query, metadata)
     cases = await asyncio.to_thread(format_results, raw_results, metadata)
-    yield f"data: {json.dumps({'agent': 'researcher', 'message': f'Found {len(cases)} relevant precedents.', 'data': cases})}\n\n"
+    yield f"data: {json.dumps({'type': 'telemetry', 'agent': 'researcher', 'message': f'Found {len(cases)} relevant precedents.', 'data': cases})}\n\n"
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'researcher', 'status': 'complete'})}\n\n"
 
     if not cases:
-        yield f"data: {json.dumps({'agent': 'orchestrator', 'message': 'No precedents found for this specific query.'})}\n\n"
+        yield f"data: {json.dumps({'type': 'telemetry', 'agent': 'orchestrator', 'message': 'No precedents found for this specific query.'})}\n\n"
         return
 
-    yield f"data: {json.dumps({'agent': 'summarizer', 'message': 'Synthesizing judicial holdings...'})}\n\n"
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'analysis', 'status': 'running'})}\n\n"
+    yield f"data: {json.dumps({'type': 'telemetry', 'agent': 'analysis', 'message': 'Synthesizing judicial holdings...'})}\n\n"
     await asyncio.sleep(1)
-    summaries = []
-    for case in cases:
-        summary = await asyncio.to_thread(run_summarizer, case['content'])
-        case['summary'] = summary
-        case['holding'] = summary.split("Holding:")[1].split("\n")[0].strip() if "Holding:" in summary else "Judgment Summary Available"
-        case['ratio_decidendi'] = summary.split("Ratio:")[1].split("\n")[0].strip() if "Ratio:" in summary else "Legal Analysis Extracted"
-        summaries.append(case)
-    yield f"data: {json.dumps({'agent': 'summarizer', 'message': 'Summary extraction complete.', 'data': summaries})}\n\n"
+    summaries = await asyncio.to_thread(run_summarizer, cases)
+    yield f"data: {json.dumps({'type': 'telemetry', 'agent': 'analysis', 'message': 'Summary extraction complete.'})}\n\n"
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'analysis', 'status': 'complete'})}\n\n"
 
-    yield f"data: {json.dumps({'agent': 'critic', 'message': 'Applying constitutional scrutiny and validation...'})}\n\n"
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'validation', 'status': 'running'})}\n\n"
+    yield f"data: {json.dumps({'type': 'telemetry', 'agent': 'validation', 'message': 'Applying constitutional scrutiny and validation...'})}\n\n"
     await asyncio.sleep(1)
-    validated_cases = []
-    for case in summaries:
-        critic_output = await asyncio.to_thread(run_critic, case['content'])
-        case['confidence_score'] = 85 if "Strong" in critic_output else 70
-        case['special_case_flag'] = "Yes" if "Landmark" in critic_output else "No"
-        validated_cases.append(case)
-
+    validated_cases = await asyncio.to_thread(run_critic, summaries, query)
+    yield f"data: {json.dumps({'type': 'telemetry', 'agent': 'validation', 'message': 'Validation complete.'})}\n\n"
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'validation', 'status': 'complete'})}\n\n"
+    
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'memorandum', 'status': 'running'})}\n\n"
+    yield f"data: {json.dumps({'type': 'telemetry', 'agent': 'memorandum', 'message': 'Drafting executive memorandum...'})}\n\n"
+    await asyncio.sleep(1)
     save_to_history(query, validated_cases)
-    yield f"data: {json.dumps({'agent': 'critic', 'message': 'Executive research complete.', 'data': validated_cases, 'type': 'payload'})}\n\n"
+    yield f"data: {json.dumps({'type': 'telemetry', 'agent': 'memorandum', 'message': 'Executive research complete.'})}\n\n"
+    yield f"data: {json.dumps({'type': 'status', 'agent': 'memorandum', 'status': 'complete'})}\n\n"
+
+    yield f"data: {json.dumps({'type': 'payload', 'agent': 'critic', 'data': validated_cases})}\n\n"
 
 @app.post("/api/research")
 async def generate_legal_memo(request: SearchQuery):

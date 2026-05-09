@@ -6,6 +6,8 @@ Project-local Antigravity skills installed for this repo.
 |-------|------|---------|
 | `debugger` | `.antigravity/skills/debugger/` | Root-cause analysis specialist — captures errors, isolates failures, implements minimal fixes |
 | `systematic-debugging` | `.antigravity/skills/systematic-debugging/` | 4-phase structured debugging process (Root Cause → Pattern → Hypothesis → Implementation) |
+| `webapp-testing` | `.antigravity/skills/webapp-testing/` | Framework for writing native Python Playwright scripts to test local web applications |
+| `testing-patterns` | `.antigravity/skills/testing-patterns/` | Best practices for test architecture, mocking, assertions, and testability |
 
 ## Usage
 

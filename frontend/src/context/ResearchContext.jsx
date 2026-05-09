@@ -30,7 +30,7 @@ export const ResearchProvider = ({ children }) => {
   }, []);
 
   const handleResearch = useCallback(async (queryText) => {
-    const q = queryText || query;
+    const q = typeof queryText === 'string' ? queryText : query;
     if (!q || isResearching) return;
 
     // Save current to history before starting new search

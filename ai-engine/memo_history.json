@@ -1,79 +1,142 @@
 [
   {
-    "query": "What are the latest Supreme Court rulings from 2025 on Section 227 of the CrPC regarding discharge of accused?",
-    "timestamp": "2026-05-08T17:52:53.712676",
-    "case_count": 3,
-    "avg_confidence": 6.7,
+    "query": "copyrigt",
+    "timestamp": "2026-05-09T05:48:34.685321",
+    "case_count": 10,
+    "avg_confidence": 8.0,
     "date": "Just now"
   },
   {
-    "query": "What are the latest Supreme Court rulings from 2025 on Section 227 of the CrPC regarding discharge of accused?",
-    "timestamp": "2026-05-08T17:50:07.873924",
+    "query": "copyright infilgrimenr=t",
+    "timestamp": "2026-05-09T05:41:43.612557",
+    "case_count": 10,
+    "avg_confidence": 33.5,
+    "date": "Just now"
+  },
+  {
+    "query": "copyright infringement act",
+    "timestamp": "2026-05-09T05:36:13.859886",
+    "case_count": 10,
+    "avg_confidence": 44.5,
+    "date": "Just now"
+  },
+  {
+    "query": "copyright infringement ",
+    "timestamp": "2026-05-09T05:28:45.030730",
+    "case_count": 10,
+    "avg_confidence": 27.0,
+    "date": "Just now"
+  },
+  {
+    "query": "copyright infringement criminal cases",
+    "timestamp": "2026-05-09T05:28:39.640844",
+    "case_count": 10,
+    "avg_confidence": 35.0,
+    "date": "Just now"
+  },
+  {
+    "query": "copyright infringement ",
+    "timestamp": "2026-05-09T05:26:52.204510",
+    "case_count": 10,
+    "avg_confidence": 26.0,
+    "date": "Just now"
+  },
+  {
+    "query": "copyright ",
+    "timestamp": "2026-05-09T05:23:46.285653",
+    "case_count": 10,
+    "avg_confidence": 18.0,
+    "date": "Just now"
+  },
+  {
+    "query": "copyright infridgement ",
+    "timestamp": "2026-05-09T05:22:36.255337",
+    "case_count": 10,
+    "avg_confidence": 8.0,
+    "date": "Just now"
+  },
+  {
+    "query": "copyright infringement",
+    "timestamp": "2026-05-09T05:20:13.815404",
+    "case_count": 10,
+    "avg_confidence": 25.0,
+    "date": "Just now"
+  },
+  {
+    "query": "criminal charges for copyright infringement",
+    "timestamp": "2026-05-09T05:05:18.379975",
     "case_count": 0,
     "avg_confidence": 0,
     "date": "Just now"
   },
   {
-    "query": "What are the latest Supreme Court rulings from 2025 on Section 227 of the CrPC regarding discharge of accused?",
-    "timestamp": "2026-05-08T17:21:45.213953",
-    "case_count": 3,
-    "avg_confidence": 6.7,
+    "query": "copyright infringement cases",
+    "timestamp": "2026-05-09T05:04:44.204322",
+    "case_count": 10,
+    "avg_confidence": 43.0,
     "date": "Just now"
   },
   {
-    "query": "Recent PMLA rulings regarding the 'twin conditions' for bail in money laundering cases",
-    "timestamp": "2026-05-08T16:52:58.659309",
-    "case_count": 3,
-    "avg_confidence": 80.0,
+    "query": "copyright infringement ",
+    "timestamp": "2026-05-09T05:01:35.120715",
+    "case_count": 10,
+    "avg_confidence": 27.0,
     "date": "Just now"
   },
   {
-    "query": "Recent PMLA rulings regarding the 'twin conditions' for bail in money laundering cases",
-    "timestamp": "2026-05-08T16:51:30.846693",
-    "case_count": 0,
-    "avg_confidence": 0,
+    "query": "criminal cases for copyright infringement '",
+    "timestamp": "2026-05-09T05:01:30.200949",
+    "case_count": 10,
+    "avg_confidence": 35.0,
     "date": "Just now"
   },
   {
-    "query": "Recent PMLA rulings regarding the 'twin conditions' for bail in money laundering cases",
-    "timestamp": "2026-05-08T16:51:30.794474",
-    "case_count": 3,
-    "avg_confidence": 83.3,
+    "query": "criminal charges for copyright infringement ",
+    "timestamp": "2026-05-09T04:47:33.589697",
+    "case_count": 10,
+    "avg_confidence": 18.0,
     "date": "Just now"
   },
   {
-    "query": "Recent PMLA rulings regarding the 'twin conditions' for bail in money laundering cases",
-    "timestamp": "2026-05-08T14:20:23.129140",
-    "case_count": 3,
-    "avg_confidence": 53.3,
+    "query": "Supreme Court judgments from 2025 regarding bail under the PMLA Act",
+    "timestamp": "2026-05-08T22:38:30.261387",
+    "case_count": 10,
+    "avg_confidence": 18.0,
     "date": "Just now"
   },
   {
-    "query": "Recent PMLA rulings regarding the 'twin conditions' for bail in money laundering cases",
-    "timestamp": "2026-05-08T14:09:37.291535",
-    "case_count": 3,
-    "avg_confidence": 83.3,
+    "query": "Supreme Court judgments from 2025 regarding bail under the PMLA Act",
+    "timestamp": "2026-05-08T22:38:13.256911",
+    "case_count": 10,
+    "avg_confidence": 10.0,
     "date": "Just now"
   },
   {
-    "query": "Recent PMLA rulings regarding the 'twin conditions' for bail in money laundering cases",
-    "timestamp": "2026-05-08T14:00:06.982637",
-    "case_count": 3,
-    "avg_confidence": 58.3,
+    "query": "Supreme Court judgments from 2025 regarding bail under the PMLA Act",
+    "timestamp": "2026-05-08T22:36:47.594658",
+    "case_count": 10,
+    "avg_confidence": 27.5,
     "date": "Just now"
   },
   {
-    "query": "Recent PMLA rulings regarding the 'twin conditions' for bail in money laundering cases",
-    "timestamp": "2026-05-08T13:52:53.980173",
-    "case_count": 3,
-    "avg_confidence": 66.7,
+    "query": "Supreme Court judgments from 2025 regarding bail under the PMLA Act",
+    "timestamp": "2026-05-08T22:32:07.159809",
+    "case_count": 10,
+    "avg_confidence": 20.0,
     "date": "Just now"
   },
   {
-    "query": "Recent PMLA rulings regarding the 'twin conditions' for bail in money laundering cases",
-    "timestamp": "2026-05-08T13:51:28.207327",
-    "case_count": 0,
-    "avg_confidence": 0,
+    "query": "Supreme Court judgments from 2025 regarding bail under the PMLA Act",
+    "timestamp": "2026-05-08T21:33:41.728141",
+    "case_count": 10,
+    "avg_confidence": 10.0,
+    "date": "Just now"
+  },
+  {
+    "query": "Supreme Court judgments from 2025 regarding bail under the PMLA Act",
+    "timestamp": "2026-05-08T21:00:59.811042",
+    "case_count": 10,
+    "avg_confidence": 34.0,
     "date": "Just now"
   }
 ]
