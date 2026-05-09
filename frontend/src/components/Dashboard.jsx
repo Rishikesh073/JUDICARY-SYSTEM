@@ -10,9 +10,7 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                // Using 127.0.0.1 instead of localhost for more reliable Windows connectivity
                 const res = await axios.get('http://127.0.0.1:5001/api/dashboard-stats');
-                console.log("[Dashboard] Stats fetched:", res.data);
                 if (res.data) setStats(res.data);
             } catch (err) {
                 console.error("[Dashboard] Failed to fetch stats:", err.message);
@@ -20,7 +18,10 @@ export default function Dashboard() {
                 setLoading(false);
             }
         };
+        
         fetchStats();
+        const interval = setInterval(fetchStats, 10000);
+        return () => clearInterval(interval);
     }, []);
 
     const totalMemos = stats?.history?.length || 0;
@@ -31,18 +32,12 @@ export default function Dashboard() {
     return (
         <div className="flex flex-col gap-8 animate-in fade-in duration-500 pb-20">
             {/* Top Stats Row */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <StatCard
                     icon={<BookOpen />}
                     title="Precedents Scanned"
                     value={loading ? "..." : `${stats?.collection?.total_precedents || 0}+`}
                     color="text-blue-600"
-                />
-                <StatCard
-                    icon={<Clock />}
-                    title="Research Hours Saved"
-                    value={loading ? "..." : `${(totalMemos * 4.5).toFixed(1)} hrs`}
-                    color="text-orange-600"
                 />
                 <StatCard
                     icon={<ShieldCheck />}

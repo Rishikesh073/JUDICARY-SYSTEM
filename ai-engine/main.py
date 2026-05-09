@@ -31,11 +31,12 @@ def save_to_history(query, cases):
                 history = json.load(f)
         except:
             history = []
-    for item in history:
-        if item['query'] == query:
-            return
+    # Removed duplicate check to ensure every research session is recorded
+    # for item in history:
+    #     if item['query'] == query:
+    #         return
 
-    # Store only lean case data to keep file size manageable
+    # Store rich case data to keep history meaningful
     slim_cases = []
     for c in cases:
         slim_cases.append({
@@ -44,7 +45,17 @@ def save_to_history(query, cases):
             "court": c.get("court", "Supreme Court of India"),
             "act": c.get("act", "N/A"),
             "holding": c.get("holding", ""),
+            "ratio_decidendi": c.get("ratio_decidendi", ""),
+            "verdict": c.get("verdict", "Rejected"),
             "confidence_score": c.get("confidence_score", 0),
+            "outcome": c.get("outcome", ""),
+            "bench_strength": c.get("bench_strength", ""),
+            "date_of_judgment": c.get("date_of_judgment", ""),
+            "coram": c.get("coram", ""),
+            "crime_charges": c.get("crime_charges", ""),
+            "sentence_duration": c.get("sentence_duration", ""),
+            "special_case_flag": c.get("special_case_flag", ""),
+            "cited_precedents": c.get("cited_precedents", [])
         })
 
     history.insert(0, {
@@ -236,6 +247,41 @@ async def get_history():
             return json.load(f)
     return []
 
+@app.get("/api/stats")
+async def get_stats():
+    """Fetch live stats for the dashboard."""
+    history = []
+    if os.path.exists(HISTORY_FILE):
+        try:
+            with open(HISTORY_FILE, "r") as f:
+                history = json.load(f)
+        except:
+            history = []
+    
+    # Calculate avg confidence if missing or based on new rich case data
+    for item in history:
+        if "avg_confidence" not in item or item.get("cases"):
+            cases = item.get("cases", [])
+            if cases:
+                confidences = [c.get("confidence_score", 0) for c in cases if c.get("confidence_score", 0) > 0]
+                item["avg_confidence"] = sum(confidences) / len(confidences) if confidences else 0
+            elif "avg_confidence" not in item:
+                item["avg_confidence"] = 0
+
+    total_precedents = 0
+    try:
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chroma_db")
+        client = chromadb.PersistentClient(path=db_path)
+        collection = client.get_collection(name="lexagent_precedents")
+        total_precedents = collection.count()
+    except:
+        total_precedents = 26688 # Fallback
+
+    return {
+        "collection": {"total_precedents": total_precedents},
+        "history": history[:10] # Top 10 recent
+    }
+
 @app.get("/")
 async def health_check():
-    return {"status": "LexAgent AI Engine is Online!"}
+    return {"status": "LexAgent AI Engine is Online!"}
