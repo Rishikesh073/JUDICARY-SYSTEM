@@ -112,7 +112,7 @@ const Navbar = ({ hidden = false }) => {
             )}
           </AnimatePresence>
           <Link to="/dashboard" className="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm">
-            Get started free
+            Dashboard
           </Link>
         </div>
       </div>
@@ -125,7 +125,7 @@ const Navbar = ({ hidden = false }) => {
               <Link to="/how-it-works" className="py-2 px-3 rounded-md hover:bg-slate-50">How it works</Link>
               <Link to="/research" className="py-2 px-3 rounded-md hover:bg-slate-50">Research</Link>
               <Link to="/vault" className="py-2 px-3 rounded-md hover:bg-slate-50 font-semibold text-orange-600">VAULT</Link>
-              <Link to="/dashboard" className="py-2 px-3 rounded-md bg-orange-600 text-white text-center rounded-lg">Get started free</Link>
+              <Link to="/dashboard" className="py-2 px-3 rounded-md bg-orange-600 text-white text-center rounded-lg">Dashboard</Link>
 
               <div className="pt-2 border-t border-slate-100 mt-2">
                 <div className="text-sm font-semibold text-slate-800 mb-2">Features</div>

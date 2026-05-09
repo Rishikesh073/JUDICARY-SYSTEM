@@ -32,7 +32,7 @@ const Hero = () => {
           transition={{ ...FADE_IN.transition, delay: 0.2 }}
           className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed"
         >
-          Ask a complex legal question. Get a court-ready 2-page memo with verified precedents in under 2 minutes — not 14 hours.
+          Ask a complex legal question. Get a court-ready 2-page memo with verified precedents in under 5 minutes — not 14 hours.
         </motion.p>
 
         <motion.div 
@@ -43,12 +43,7 @@ const Hero = () => {
           <Link to="/research" className="bg-orange-600 hover:bg-orange-700 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg shadow-xl shadow-orange-600/30 transition-all hover:scale-105 active:scale-95 text-center">
             Start researching — it's free
           </Link>
-          <button 
-            onClick={() => document.getElementById('comparison')?.scrollIntoView({ behavior: 'smooth' })}
-            className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-900 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg shadow-sm transition-all text-center"
-          >
-            See how it works
-          </button>
+
         </motion.div>
 
         {/* Stats Strip */}
@@ -66,7 +61,7 @@ const Hero = () => {
             <span className="text-xs uppercase tracking-widest text-slate-600 font-medium">Citation accuracy</span>
           </div>
           <div className="flex flex-col items-center gap-1 border-l border-slate-200">
-            <span className="text-3xl font-serif text-slate-900">50+</span>
+            <span className="text-3xl font-serif text-slate-900">10+</span>
             <span className="text-xs uppercase tracking-widest text-slate-600 font-medium">Cases per query</span>
           </div>
           <div className="flex flex-col items-center gap-1 border-l border-slate-200">
