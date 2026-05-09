@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Loader2, CheckCircle2, FileText, Download, Eye, Gavel, AlertTriangle, BookOpen, History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
-
 import { useResearch } from '../context/ResearchContext';
 import { AgentOrchestrator } from './AgentOrchestrator';
 import CitationGraph from './CitationGraph';
@@ -33,6 +32,7 @@ const LiveWorkspace = () => {
   } = useResearch();
 
   const [queryTip, setQueryTip] = useState('Tip: Start with a specific legal question or case type.');
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     if (!query) {
@@ -48,22 +48,140 @@ const LiveWorkspace = () => {
     }
   }, [query]);
 
-  const downloadMemo = () => {
+  const downloadMemo = async () => {
     if (!memo) return;
-    const doc = new jsPDF();
-    doc.setFontSize(22);
-    doc.setTextColor(217, 119, 6);
-    doc.text('LEXAGENT — LEGAL MEMORANDUM', 10, 20);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Query: ${memo.query}`, 10, 30);
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, 10, 35);
-    doc.line(10, 40, 200, 40);
-    doc.setFontSize(12);
-    doc.setTextColor(0);
-    const splitText = doc.splitTextToSize(memo.query, 180);
-    doc.text(splitText, 10, 50);
-    doc.save(`lexagent_memo_${memo.query.substring(0, 20)}.pdf`);
+    setIsExporting(true);
+    
+    // Give UI a moment to update the button to "Preparing..."
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    try {
+      const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+      let y = 0;
+      const marginX = 15;
+      const pageWidth = 210;
+      
+      const primary = [249, 115, 22]; // orange-500
+      const slate900 = [15, 23, 42];
+      const slate600 = [71, 85, 105];
+      const slate200 = [226, 232, 240];
+      const slate50  = [248, 250, 252];
+      
+      // Header Banner
+      doc.setFillColor(...primary);
+      doc.rect(0, 0, pageWidth, 20, 'F');
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("LEXAGENT ELITE • LEGAL MEMORANDUM", marginX, 13);
+      
+      y = 35;
+      
+      // Query Section
+      doc.setTextColor(...slate900);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text("Research Report", marginX, y);
+      
+      y += 8;
+      doc.setTextColor(...slate600);
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(11);
+      
+      const splitQuery = doc.splitTextToSize(`Query: "${memo.query}"`, pageWidth - (marginX * 2));
+      doc.text(splitQuery, marginX, y);
+      y += (splitQuery.length * 6) + 5;
+      
+      // Divider
+      doc.setDrawColor(...slate200);
+      doc.setLineWidth(0.5);
+      doc.line(marginX, y, pageWidth - marginX, y);
+      y += 10;
+      
+      // Render Cases
+      if (memo.cases && memo.cases.length > 0) {
+        memo.cases.forEach((c, idx) => {
+          // Check page overflow
+          if (y > 260) {
+            doc.addPage();
+            y = 20;
+          }
+          
+          // Case Title Background
+          doc.setFillColor(...slate50);
+          doc.rect(marginX, y - 5, pageWidth - (marginX * 2), 12, 'F');
+          
+          doc.setTextColor(...slate900);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(12);
+          
+          // Shorten title if too long
+          let title = `${idx + 1}. ${c.filename?.replace('.pdf', '').replace(/_/g, ' ')}`;
+          if (title.length > 80) title = title.substring(0, 77) + "...";
+          doc.text(title, marginX + 3, y + 2);
+          y += 12;
+          
+          // Case Meta
+          doc.setTextColor(...slate600);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(9);
+          doc.text(`Court: ${c.court}   |   Year: ${c.year}   |   Verdict: ${c.verdict}`, marginX + 3, y);
+          y += 8;
+          
+          // Holding
+          doc.setTextColor(...slate900);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(10);
+          doc.text("Judicial Holding:", marginX + 3, y);
+          y += 5;
+          
+          doc.setTextColor(...slate600);
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10);
+          const splitHolding = doc.splitTextToSize(c.holding || "N/A", pageWidth - (marginX * 2) - 6);
+          
+          // Page break during text if needed
+          if (y + (splitHolding.length * 5) > 280) {
+             doc.addPage();
+             y = 20;
+          }
+          
+          doc.text(splitHolding, marginX + 3, y);
+          y += (splitHolding.length * 5) + 6;
+          
+          // Ratio
+          if (y > 270) {
+             doc.addPage();
+             y = 20;
+          }
+          doc.setTextColor(...slate900);
+          doc.setFont("helvetica", "bold");
+          doc.text("Ratio Decidendi:", marginX + 3, y);
+          y += 5;
+          
+          doc.setTextColor(...slate600);
+          doc.setFont("helvetica", "normal");
+          const splitRatio = doc.splitTextToSize(c.ratio_decidendi || "N/A", pageWidth - (marginX * 2) - 6);
+          
+          if (y + (splitRatio.length * 5) > 280) {
+             doc.addPage();
+             y = 20;
+          }
+          
+          doc.text(splitRatio, marginX + 3, y);
+          y += (splitRatio.length * 5) + 12;
+        });
+      }
+      
+      // Save
+      doc.save(`lexagent_memo_${memo.query.substring(0, 20).replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
+      
+    } catch (err) {
+      console.error("PDF Export Error:", err);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -146,10 +264,16 @@ const LiveWorkspace = () => {
             
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-6 gap-4">
               <div className="flex flex-wrap gap-2">
-                {['Supreme Court', '2014-2025', 'PMLA'].map(tag => (
+                {[
+                  'PMLA bail conditions',
+                  'Section 498A IPC cruelty',
+                  'Medical negligence compensation',
+                  'Arbitration award challenges',
+                  'Defamation under Section 499 IPC'
+                ].map(tag => (
                   <button 
                     key={tag}
-                    onClick={() => setQuery(prev => prev ? `${prev.trim()} ${tag}` : tag)}
+                    onClick={() => setQuery(tag)}
                     className="px-4 py-1.5 rounded-full bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-200 text-xs text-slate-600 hover:text-orange-700 font-semibold transition-all transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow"
                   >
                     {tag}
@@ -203,7 +327,7 @@ const LiveWorkspace = () => {
 
           <AnimatePresence>
             {memo && (
-              <InteractiveMemo query={memo.query} cases={memo.cases} downloadMemo={downloadMemo} navigate={navigate} />
+              <InteractiveMemo query={memo.query} cases={memo.cases} downloadMemo={downloadMemo} isExporting={isExporting} navigate={navigate} />
             )}
           </AnimatePresence>
 
@@ -214,11 +338,12 @@ const LiveWorkspace = () => {
           )}
         </motion.div>
       </div>
+
     </section>
   );
 };
 
-const InteractiveMemo = ({ query, cases, downloadMemo, navigate }) => {
+const InteractiveMemo = ({ query, cases, downloadMemo, isExporting, navigate }) => {
   const [activeCaseIdx, setActiveCaseIdx] = useState(0);
   const [activeTab, setActiveTab] = useState('holding'); // 'holding', 'ratio', 'details'
 
@@ -256,9 +381,18 @@ const InteractiveMemo = ({ query, cases, downloadMemo, navigate }) => {
           </button>
           <button 
             onClick={downloadMemo}
-            className="bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold px-4 py-2 rounded-lg border border-white/10 flex items-center gap-2 transition-all"
+            disabled={isExporting}
+            className="bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold px-4 py-2 rounded-lg border border-white/10 flex items-center gap-2 transition-all disabled:opacity-50"
           >
-            <Download size={14} /> Export PDF
+            {isExporting ? (
+              <>
+                <Loader2 size={14} className="animate-spin" /> Preparing...
+              </>
+            ) : (
+              <>
+                <Download size={14} /> Export PDF
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -411,5 +545,7 @@ const Badge = ({ label, value }) => (
     <span className="text-[11px] font-bold text-slate-700">{value}</span>
   </div>
 );
+
+// HiddenPdfTemplate removed in favor of direct jsPDF generation.
 
 export default LiveWorkspace;

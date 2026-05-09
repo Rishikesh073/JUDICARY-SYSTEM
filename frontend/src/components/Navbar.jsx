@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, ChevronDown, Search, Database, FileText, History, X, Loader2 } from 'lucide-react';
+import { Shield, ChevronDown, Search, Database, FileText, History, X, Loader2, Scale } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useResearch } from '../context/ResearchContext';
@@ -12,7 +12,6 @@ const Navbar = ({ hidden = false }) => {
   const { isResearching, abortResearch, query } = useResearch();
 
   const features = [
-    { name: 'Semantic Search', desc: 'Context-aware precedent retrieval', icon: Search, path: '/research' },
     { name: 'Case Explorer', desc: 'Browse database by court and act', icon: Database, path: '/explorer' },
     { name: 'Memo History', desc: 'Your saved research library', icon: History, path: '/history' },
   ];
@@ -23,7 +22,7 @@ const Navbar = ({ hidden = false }) => {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
           <div className="bg-orange-600/20 p-2 rounded-lg border border-orange-500/30 group-hover:bg-orange-600/30 transition-all">
-            <Shield className="text-orange-500" size={24} />
+            <Scale className="text-orange-500" size={24} />
           </div>
           <span className="text-xl font-bold tracking-tight text-slate-900 font-serif">LexAgent</span>
         </Link>
