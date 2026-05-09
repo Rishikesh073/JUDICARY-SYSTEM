@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Loader2, CheckCircle2, FileText, Download, Eye, Gavel, AlertTriangle, BookOpen } from 'lucide-react';
+import { Search, Loader2, CheckCircle2, FileText, Download, Eye, Gavel, AlertTriangle, BookOpen, History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { jsPDF } from 'jspdf';
 
@@ -27,6 +27,8 @@ const LiveWorkspace = () => {
     error,
     agentStatuses,
     telemetry,
+    history,
+    loadHistoryItem,
     handleResearch,
   } = useResearch();
 
@@ -67,46 +69,126 @@ const LiveWorkspace = () => {
   return (
     <section className="py-24 px-6 bg-slate-100" id="research">
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="text-xs uppercase tracking-widest text-orange-600 font-bold mb-4 block">Live Workspace</span>
-          <h2 className="text-4xl font-serif mb-4 text-slate-900">Ask. Analyze. Act.</h2>
-          <p className="text-slate-600">Natural language legal queries — no boolean operators, no keyword games.</p>
+        <div className="text-center mb-16 relative">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 border border-orange-200 text-orange-700 text-[10px] font-bold uppercase tracking-widest mb-6"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+            Live Workspace
+          </motion.div>
+          <motion.h2 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-5xl font-serif mb-6 text-slate-900 tracking-tight"
+          >
+            Ask. Analyze. <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-500 italic pr-2">Act.</span>
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-lg text-slate-600 max-w-2xl mx-auto"
+          >
+            Natural language legal queries — no boolean operators, no keyword games.
+          </motion.p>
         </div>
 
-        <div className="bg-white border border-slate-200 shadow-sm rounded-2xl p-8">
-          <div className="mb-10">
-            <label className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-3 block">Your Query</label>
-            <div className="relative">
-              <input 
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !isResearching) handleResearch();
-                }}
-                placeholder="Find all Supreme Court judgments from the last 10 years where bail was denied for financial fraud..."
-                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-6 py-4 text-slate-900 focus:outline-none focus:border-orange-500/50 transition-all placeholder:text-slate-500 italic"
-              />
-              <button 
-                onClick={handleResearch}
-                disabled={isResearching}
-                className="absolute right-2 top-2 bottom-2 bg-orange-600 hover:bg-orange-700 text-white px-6 rounded-lg font-bold flex items-center gap-2 transition-all disabled:opacity-50"
-              >
-                {isResearching ? <Loader2 className="animate-spin" size={18} /> : <Search size={18} />}
-                Research now
-              </button>
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/80 backdrop-blur-xl border border-slate-200 shadow-2xl shadow-slate-200/50 rounded-3xl p-6 sm:p-10 relative overflow-hidden"
+        >
+          {/* Subtle background glow */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-orange-400/10 rounded-full blur-[80px] -z-10 -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+          
+          <div className="mb-10 relative z-10">
+            <label className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-400 font-bold mb-4 ml-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)]"></div>
+              Your Query
+            </label>
+            
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-orange-500/20 to-amber-500/20 rounded-[1.25rem] blur-md opacity-0 group-focus-within:opacity-100 transition duration-500"></div>
+              <div className="relative flex flex-col sm:flex-row items-center bg-white border-2 border-slate-200 focus-within:border-orange-400 rounded-2xl p-2 transition-all shadow-sm focus-within:shadow-md gap-2 sm:gap-0">
+                <Search className="text-slate-400 ml-4 hidden sm:block shrink-0 transition-colors group-focus-within:text-orange-500" size={22} />
+                <input 
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !isResearching && query.trim().length > 0) handleResearch();
+                  }}
+                  placeholder="Find Supreme Court judgments from the last 10 years..."
+                  className="w-full bg-transparent border-none px-4 py-3 sm:py-4 text-base sm:text-lg text-slate-900 focus:outline-none focus:ring-0 placeholder:text-slate-400 font-medium"
+                />
+                <button 
+                  onClick={handleResearch}
+                  disabled={isResearching || query.trim().length === 0}
+                  className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white px-8 py-4 sm:py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all transform active:scale-95 shadow-lg shadow-orange-500/30 disabled:opacity-50 disabled:active:scale-100 disabled:shadow-none whitespace-nowrap shrink-0"
+                >
+                  {isResearching ? (
+                    <>
+                      <Loader2 className="animate-spin" size={18} />
+                      <span>Analyzing</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Research now</span>
+                      <Search className="sm:hidden ml-2" size={18} />
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
             
-            <div className="flex items-center justify-between mt-4">
-              <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-6 gap-4">
+              <div className="flex flex-wrap gap-2">
                 {['Supreme Court', '2014-2025', 'PMLA'].map(tag => (
-                  <span key={tag} className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-[10px] text-slate-600 font-bold">{tag}</span>
+                  <button 
+                    key={tag}
+                    onClick={() => setQuery(prev => prev ? `${prev.trim()} ${tag}` : tag)}
+                    className="px-4 py-1.5 rounded-full bg-slate-50 hover:bg-orange-50 border border-slate-200 hover:border-orange-200 text-xs text-slate-600 hover:text-orange-700 font-semibold transition-all transform hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow"
+                  >
+                    {tag}
+                  </button>
                 ))}
               </div>
-              <p className={`text-[10px] font-medium italic ${query.length > 0 && query.length < 15 ? 'text-orange-500' : 'text-slate-400'}`}>
+              <p className={`text-xs font-medium italic flex items-center gap-1.5 transition-colors ${query.length > 0 && query.length < 15 ? 'text-orange-500' : 'text-slate-400'}`}>
                 {queryTip}
               </p>
             </div>
+
+            {history && history.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-8 border-t border-slate-100 pt-6"
+              >
+                <label className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold mb-4 ml-1">
+                  <History size={12} className="text-orange-500" />
+                  Recent Searches
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {history.map((item) => (
+                    <button 
+                      key={item.id}
+                      onClick={() => loadHistoryItem(item)}
+                      className="text-left px-4 py-3 rounded-xl bg-slate-50/50 hover:bg-orange-50 border border-slate-200 hover:border-orange-300 transition-all group flex flex-col justify-center"
+                    >
+                      <span className="text-sm font-semibold text-slate-700 group-hover:text-orange-700 truncate w-full mb-1">
+                        {item.query}
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        {item.date} • {item.cases?.length || 0} Cases
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
           </div>
 
           {(isResearching || memo) && (
@@ -130,7 +212,7 @@ const LiveWorkspace = () => {
               {error}
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

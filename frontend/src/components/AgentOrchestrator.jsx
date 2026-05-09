@@ -17,12 +17,12 @@ const AgentNode = ({ agent, status, isLast }) => {
   const isIdle = status === 'idle';
 
   return (
-    <div className="flex items-center group">
+    <div className="flex items-center group shrink-0">
       <div className="flex flex-col items-center gap-3 relative">
         <motion.div
           animate={isRunning ? { 
             scale: [1, 1.05, 1],
-            boxShadow: ["0 0 0px rgba(59, 130, 246, 0)", "0 0 20px rgba(59, 130, 246, 0.3)", "0 0 0px rgba(59, 130, 246, 0)"]
+            boxShadow: ["0 0 0px rgba(59, 130, 246, 0)", "0 0 25px rgba(59, 130, 246, 0.5)", "0 0 0px rgba(59, 130, 246, 0)"]
           } : {}}
           transition={{ repeat: Infinity, duration: 2 }}
           className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 transition-all duration-500 ${
@@ -36,27 +36,27 @@ const AgentNode = ({ agent, status, isLast }) => {
           {isRunning && (
              <motion.div 
                layoutId="pulse"
-               className="absolute inset-0 rounded-xl bg-blue-400/10"
-               animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
+               className="absolute inset-0 rounded-xl bg-blue-500/20"
+               animate={{ scale: [1, 1.25, 1], opacity: [0.8, 0, 0.8] }}
                transition={{ repeat: Infinity, duration: 2 }}
              />
           )}
         </motion.div>
         
         <div className="flex flex-col items-center">
-            <span className={`text-[10px] font-bold uppercase tracking-widest transition-colors duration-500 ${
+            <span className={`text-xs font-bold uppercase tracking-widest transition-colors duration-500 whitespace-nowrap ${
             isRunning ? 'text-blue-600' : isComplete ? 'text-emerald-600' : 'text-slate-500'
             }`}>
             {agent.label}
             </span>
-            <span className="text-[8px] font-medium text-slate-400 uppercase tracking-tighter mt-0.5">
+            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-tighter mt-0.5 whitespace-nowrap">
                 {status}
             </span>
         </div>
       </div>
 
       {!isLast && (
-        <div className="w-12 lg:w-20 h-[2px] bg-slate-100 mx-2 mt-[-24px] relative overflow-hidden">
+        <div className="w-8 md:w-12 lg:w-16 h-[2px] bg-slate-200 mx-2 mt-[-24px] relative overflow-hidden shrink-0">
           {(isRunning || isComplete) && (
             <motion.div 
               initial={{ x: '-100%' }}
@@ -69,7 +69,7 @@ const AgentNode = ({ agent, status, isLast }) => {
              <motion.div 
                animate={{ x: ['-100%', '200%'] }}
                transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-               className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-white/50 to-transparent"
+               className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-white to-transparent opacity-90"
              />
           )}
         </div>
@@ -84,17 +84,17 @@ export const AgentOrchestrator = ({ statuses, telemetry }) => {
       <div className="flex items-center justify-between mb-8">
          <div className="flex items-center gap-2">
             <Activity size={16} className="text-blue-500" />
-            <h4 className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400">Real-Time Agent Telemetry</h4>
+            <h4 className="text-xs uppercase tracking-[0.2em] font-black text-slate-400">Real-Time Agent Telemetry</h4>
          </div>
          <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                <span className="text-[9px] font-bold text-slate-500 uppercase">Orchestration Active</span>
+                <span className="text-xs font-bold text-slate-500 uppercase">Orchestration Active</span>
             </div>
          </div>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-y-12 items-center mb-16">
+      <div className="flex justify-start md:justify-center items-center mb-16 overflow-x-auto pb-6 pt-2 w-full no-scrollbar">
         {AGENTS.map((agent, idx) => (
           <AgentNode 
             key={agent.id} 
@@ -107,10 +107,10 @@ export const AgentOrchestrator = ({ statuses, telemetry }) => {
 
       <div className="bg-slate-900/5 border border-slate-200/50 rounded-2xl overflow-hidden backdrop-blur-sm">
         <div className="bg-slate-900/10 px-4 py-2 border-b border-slate-200/50 flex justify-between items-center">
-            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Live Activity Stream</span>
-            <span className="text-[9px] font-mono text-slate-400">v2.0.4-agentic</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Live Activity Stream</span>
+            <span className="text-xs font-mono text-slate-400">v2.0.4-agentic</span>
         </div>
-        <div className="p-4 max-h-[160px] overflow-y-auto font-mono text-[11px] space-y-2 scrollbar-thin scrollbar-thumb-slate-200">
+        <div className="p-4 max-h-[160px] overflow-y-auto font-mono text-sm space-y-2 scrollbar-thin scrollbar-thumb-slate-200">
           <AnimatePresence initial={false}>
             {telemetry.length === 0 ? (
               <div className="text-slate-400 italic">Awaiting query initialization...</div>

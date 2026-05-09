@@ -16,6 +16,7 @@ export const ResearchProvider = ({ children }) => {
     memorandum: 'idle',
   });
   const [telemetry, setTelemetry] = useState([]);
+  const [history, setHistory] = useState([]);
 
   // Lives at the top level — survives all route changes
   const abortControllerRef = useRef(null);
@@ -31,6 +32,17 @@ export const ResearchProvider = ({ children }) => {
   const handleResearch = useCallback(async (queryText) => {
     const q = queryText || query;
     if (!q || isResearching) return;
+
+    // Save current to history before starting new search
+    setHistory(prev => {
+      if (memo && cases.length > 0) {
+        const exists = prev.find(h => h.query === memo.query);
+        if (!exists) {
+          return [{ id: Date.now().toString(), query: memo.query, memo, cases, telemetry, date: new Date().toLocaleTimeString() }, ...prev];
+        }
+      }
+      return prev;
+    });
 
     // Cancel any previous in-flight request
     if (abortControllerRef.current) {
@@ -107,7 +119,30 @@ export const ResearchProvider = ({ children }) => {
       setIsResearching(false);
       abortControllerRef.current = null;
     }
-  }, [query, isResearching]);
+  }, [query, isResearching, memo, cases, telemetry]);
+
+  const loadHistoryItem = useCallback((item) => {
+    if (isResearching) return;
+    
+    // Save current to history before switching
+    setHistory(prev => {
+      let newHistory = prev;
+      if (memo && cases.length > 0) {
+        const exists = prev.find(h => h.query === memo.query);
+        if (!exists) {
+          newHistory = [{ id: Date.now().toString(), query: memo.query, memo, cases, telemetry, date: new Date().toLocaleTimeString() }, ...prev];
+        }
+      }
+      return newHistory;
+    });
+
+    setQuery(item.query);
+    setMemo(item.memo);
+    setCases(item.cases);
+    setTelemetry(item.telemetry);
+    setAgentStatuses({ intent: 'completed', researcher: 'completed', validation: 'completed', analysis: 'completed', memorandum: 'completed' });
+    setError(null);
+  }, [isResearching, memo, cases, telemetry]);
 
   return (
     <ResearchContext.Provider value={{
@@ -118,8 +153,10 @@ export const ResearchProvider = ({ children }) => {
       error,
       agentStatuses,
       telemetry,
+      history,
       handleResearch,
       abortResearch,
+      loadHistoryItem,
     }}>
       {children}
     </ResearchContext.Provider>
