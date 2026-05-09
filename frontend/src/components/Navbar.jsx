@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useResearch } from '../context/ResearchContext';
 
-const Navbar = () => {
+const Navbar = ({ hidden = false }) => {
+  if (hidden) return null;
+
   const [isFeaturesOpen, setIsFeaturesOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const { isResearching, abortResearch, query } = useResearch();
@@ -13,7 +15,6 @@ const Navbar = () => {
     { name: 'Semantic Search', desc: 'Context-aware precedent retrieval', icon: Search, path: '/research' },
     { name: 'Case Explorer', desc: 'Browse database by court and act', icon: Database, path: '/explorer' },
     { name: 'Memo History', desc: 'Your saved research library', icon: History, path: '/history' },
-    { name: 'Smart Citations', desc: 'Verified legal cross-referencing', icon: FileText, path: '/citations' },
   ];
 
   return (

@@ -9,48 +9,33 @@ const multer = require('multer');
 const FormData = require('form-data');
 const fs = require('fs');
 
-// Set up Multer to handle the physical file upload from React
 const upload = multer({ dest: 'uploads/' });
 
-// --- PINATA CONFIG (Loaded from .env) ---
 const PINATA_API_KEY = process.env.PINATA_API_KEY;
 const PINATA_SECRET_KEY = process.env.PINATA_SECRET_KEY;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-
-
-// The Readymade Web3 Route
+// ── VAULT ── Upload document to IPFS via Pinata
 app.post('/api/upload-vault', upload.single('document'), async (req, res) => {
     try {
         const file = req.file;
         const caseTitle = req.body.title;
-
         const status = req.body.status || 'Pending';
         const caseNumber = req.body.caseNumber || 'N/A';
 
         if (!file) return res.status(400).json({ error: "No document provided" });
 
-        console.log(`[LexVault] Preparing to upload "${caseTitle}" to decentralized IPFS network...`);
-
-        // Package the file for Pinata
         let data = new FormData();
         data.append('file', fs.createReadStream(file.path));
 
-        // Add metadata for history tracking
         const pinataMetadata = JSON.stringify({
             name: caseTitle,
-            keyvalues: {
-                status: status,
-                caseNumber: caseNumber,
-                uploadDate: new Date().toISOString()
-            }
+            keyvalues: { status, caseNumber, uploadDate: new Date().toISOString() }
         });
         data.append('pinataMetadata', pinataMetadata);
 
-        // Call the Pinata IPFS API
         const response = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS', data, {
             maxBodyLength: 'Infinity',
             headers: {
@@ -60,29 +45,22 @@ app.post('/api/upload-vault', upload.single('document'), async (req, res) => {
             }
         });
 
-        // Clean up the temporary local file
         fs.unlinkSync(file.path);
-
         const ipfsHash = response.data.IpfsHash;
-        const permanentUrl = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
 
-        console.log(`[LexVault] Success! File secured on IPFS. Hash: ${ipfsHash}`);
-
-        // Return the decentralized data to React
         res.json({
             status: "success",
             title: caseTitle,
-            ipfsHash: ipfsHash,
-            url: permanentUrl
+            ipfsHash,
+            url: `https://gateway.pinata.cloud/ipfs/${ipfsHash}`
         });
-
     } catch (error) {
         console.error("[LexVault] Pinata Error:", error.message);
         res.status(500).json({ error: "Failed to secure document on Web3 network" });
     }
 });
 
-// Route to fetch upload history from Pinata
+// ── VAULT HISTORY ── Fetch pinned files from Pinata
 app.get('/api/vault-history', async (req, res) => {
     try {
         const response = await axios.get('https://api.pinata.cloud/data/pinList?status=pinned', {
@@ -108,44 +86,30 @@ app.get('/api/vault-history', async (req, res) => {
     }
 });
 
-// The Route to talk to your Python AI
+// ── RESEARCH ── Stream AI research from Python
 app.post('/api/ask-lexagent', async (req, res) => {
     try {
         const userQuery = req.body.query;
+        console.log(`[Express] Received query: "${userQuery}". Forwarding to Python AI...`);
 
-        console.log(`[Express] Received query: "${userQuery}". Forwarding to Python AI for streaming...`);
-
-        // Set headers for SSE
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
-
-        // Ensure Express doesn't buffer
         res.flushHeaders();
 
-        // Forward the request to your FastAPI server with streaming
         const pythonResponse = await axios.post('http://127.0.0.1:8000/api/research', {
             query: userQuery
-        }, {
-            responseType: 'stream'
-        });
+        }, { responseType: 'stream' });
 
-        console.log("[Express] Streaming response from Python AI to frontend...");
-
-        // Pipe the stream directly to the React frontend
         pythonResponse.data.pipe(res);
-
     } catch (error) {
         console.error("[Express] Error communicating with Python backend:", error.message);
-        // If headers are already sent, we can't send a 500 status code normally,
-        // but if it failed to even connect to Python, headers might not be sent yet if we threw before flushHeaders
-        // Actually flushHeaders sends the headers, so we just end the stream with an error event.
         res.write(`data: {"type": "error", "message": "Failed to connect to AI Engine"}\n\n`);
         res.end();
     }
 });
 
-// Bridge to get real stats from Python AI
+// ── DASHBOARD STATS ── Bridge to Python stats
 app.get('/api/dashboard-stats', async (req, res) => {
     try {
         const response = await axios.get('http://127.0.0.1:8000/api/stats');
@@ -153,6 +117,41 @@ app.get('/api/dashboard-stats', async (req, res) => {
     } catch (error) {
         console.error("[Express] Stats Error:", error.message);
         res.status(500).json({ error: "Failed to fetch real-time stats" });
+    }
+});
+
+// ── CASE EXPLORER ── Browse/search 75-year database
+app.post('/api/explorer', async (req, res) => {
+    try {
+        console.log('[Express] Explorer query received, forwarding to Python AI...');
+        const response = await axios.post('http://127.0.0.1:8000/api/explorer', req.body, { timeout: 30000 });
+        res.json(response.data);
+    } catch (error) {
+        console.error("[Express] Explorer Error:", error.message);
+        res.status(500).json({ total: 0, cases: [], error: "Failed to connect to AI Engine" });
+    }
+});
+
+// ── CASE DETAIL ── Fetch AI insights for a specific case
+app.post('/api/case-detail', async (req, res) => {
+    try {
+        console.log('[Express] Case detail request for:', req.body.filename);
+        const response = await axios.post('http://127.0.0.1:8000/api/case-detail', req.body, { timeout: 90000 });
+        res.json(response.data);
+    } catch (error) {
+        console.error("[Express] Case Detail Error:", error.message);
+        res.status(500).json({ error: "Failed to fetch case details" });
+    }
+});
+
+// ── MEMO HISTORY ── Bridge to Python AI history
+app.get('/api/history', async (req, res) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/api/history');
+        res.json(response.data);
+    } catch (error) {
+        console.error("[Express] History Error:", error.message);
+        res.status(500).json([]);
     }
 });
 

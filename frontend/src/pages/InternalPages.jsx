@@ -6,52 +6,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import PageTransition from '../components/PageTransition';
 
-export const CaseExplorer = () => (
-  <PageTransition>
-    <div className="bg-slate-50 min-h-screen pt-32 text-slate-900">
-      <Navbar />
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center gap-4 mb-8">
-          <Link to="/" className="text-slate-500 hover:text-slate-900 transition-colors"><ArrowLeft size={20} /></Link>
-          <h1 className="text-4xl font-serif">Case Explorer</h1>
-        </div>
-        <div className="bg-white shadow-sm border border-slate-200 rounded-2xl p-6 mb-8 flex flex-wrap gap-4 items-center">
-          <div className="flex-1 min-w-[300px] relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input type="text" placeholder="Search precedents by keyword, judge, or citation..." className="w-full bg-white border border-slate-300 rounded-xl pl-12 pr-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-400" />
-          </div>
-          <button className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-3 rounded-xl font-medium transition-all flex items-center gap-2 text-sm"><Filter size={16} /> Filters</button>
-          <button className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-3 rounded-xl font-medium transition-all flex items-center gap-2 text-sm"><Download size={16} /> Export List</button>
-        </div>
-        <div className="bg-white shadow-sm border border-slate-200 rounded-2xl overflow-hidden">
-          <table className="w-full text-left">
-            <thead className="bg-slate-100 text-[10px] uppercase tracking-widest text-slate-900 font-bold">
-              <tr>
-                <th className="px-6 py-4">Citation</th>
-                <th className="px-6 py-4">Case Name</th>
-                <th className="px-6 py-4">Court</th>
-                <th className="px-6 py-4">Year</th>
-                <th className="px-6 py-4">Status</th>
-              </tr>
-            </thead>
-            <tbody className="text-sm text-slate-700 divide-y divide-slate-100">
-              {[1, 2, 3, 4, 5].map(i => (
-                <tr key={i} className="even:bg-slate-50 odd:bg-white hover:bg-slate-100 transition-colors cursor-pointer">
-                  <td className="px-6 py-4 font-mono text-orange-600/80">202{i} SC {120 + i}</td>
-                  <td className="px-6 py-4 font-serif">State of {['Maharashtra', 'Delhi', 'Karnataka'][i % 3]} v. {['John Doe', 'ABC Corp', 'Reliance'][i % 3]}</td>
-                  <td className="px-6 py-4">Supreme Court</td>
-                  <td className="px-6 py-4">202{i}</td>
-                  <td className="px-6 py-4"><span className="text-green-800 bg-green-100 px-2 py-0.5 rounded text-[10px] font-bold">Valid</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <Footer />
-    </div>
-  </PageTransition>
-);
 
 export const MemoHistory = () => {
   const memos = [

@@ -1,38 +1,40 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { ResearchProvider } from './context/ResearchContext';
 
 import LandingPage from './pages/LandingPage';
-import { CaseExplorer, MemoHistory } from './pages/InternalPages';
+import { MemoHistory } from './pages/InternalPages';
 import HowItWorks from './pages/HowItWorks';
 import DashboardPage from './pages/DashboardPage';
 import TeamWorkspace from './pages/TeamWorkspace';
 import ResearchPage from './pages/ResearchPage';
 import VaultPage from './pages/VaultPage';
-import SmartCitations from './pages/SmartCitations';
 import SmartViewPage from './pages/SmartViewPage';
+import CaseExplorerPage from './pages/CaseExplorerPage';
 
 function AnimatedRoutes() {
     const location = useLocation();
     
     return (
-        <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/research" element={<ResearchPage />} />
-            <Route path="/explorer" element={<CaseExplorer />} />
-            <Route path="/vault" element={<VaultPage />} />
-            <Route path="/history" element={<MemoHistory />} />
-            <Route path="/citations" element={<SmartCitations />} />
-            <Route path="/team" element={<TeamWorkspace />} />
-            <Route path="/smartview" element={<SmartViewPage />} />
+        <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/how-it-works" element={<HowItWorks />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/research" element={<ResearchPage />} />
+                <Route path="/explorer" element={<CaseExplorerPage />} />
+                <Route path="/vault" element={<VaultPage />} />
+                <Route path="/history" element={<MemoHistory />} />
+                <Route path="/team" element={<TeamWorkspace />} />
+                <Route path="/smartview" element={<SmartViewPage />} />
 
-            {/* Bypassing auth: Redirect /auth to dashboard as requested */}
-            <Route path="/auth" element={<Navigate to="/dashboard" replace />} />
-
-            {/* Catch-all route */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+                {/* Bypassing auth: Redirect /auth to dashboard as requested */}
+                <Route path="/auth" element={<Navigate to="/dashboard" replace />} />
+                
+                {/* Catch-all route */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+        </AnimatePresence>
     );
 }
 
