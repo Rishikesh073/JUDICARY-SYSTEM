@@ -22,3 +22,13 @@ Thumbs.db
 # Backend Uploads
 backend/uploads/
 env
+
+# Large datasets (exceed GitHub 100MB limit)
+ai-engine/master_judicial_dataset.json
+ai-engine/extracted_2025_cases.json
+ai-engine/extracted_cases_with_urls.json
+
+# Generated logs & temp files
+*.log
+backend/test_stream.js
+memo_history.json
