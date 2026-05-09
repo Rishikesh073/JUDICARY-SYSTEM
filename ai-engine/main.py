@@ -2,6 +2,7 @@ import json
 import asyncio
 import os
 import chromadb
+from datetime import datetime
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,11 +34,26 @@ def save_to_history(query, cases):
     for item in history:
         if item['query'] == query:
             return
-    history.append({
+
+    # Store only lean case data to keep file size manageable
+    slim_cases = []
+    for c in cases:
+        slim_cases.append({
+            "filename": c.get("filename", "Unknown"),
+            "year": c.get("year", "—"),
+            "court": c.get("court", "Supreme Court of India"),
+            "act": c.get("act", "N/A"),
+            "holding": c.get("holding", ""),
+            "confidence_score": c.get("confidence_score", 0),
+        })
+
+    history.insert(0, {
         "id": len(history) + 1,
         "query": query,
-        "date": "May 9, 2026",
-        "cases": cases
+        "timestamp": datetime.now().isoformat(),
+        "date": datetime.now().strftime("%b %d, %Y · %I:%M %p"),
+        "case_count": len(slim_cases),
+        "cases": slim_cases
     })
     with open(HISTORY_FILE, "w") as f:
         json.dump(history, f, indent=4)
