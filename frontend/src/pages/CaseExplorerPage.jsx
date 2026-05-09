@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Filter, ChevronRight, ArrowLeft, FileText, Database,
   AlertTriangle, X, Check, ExternalLink, Scale, BookOpen,
-  Lightbulb, Loader, Shield, Gavel, Calendar
+  Lightbulb, Loader, Shield, Gavel, Calendar, Download, Eye
 } from 'lucide-react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
@@ -223,8 +223,18 @@ const CaseExplorerPage = () => {
                       <span className="text-[9px] font-black text-orange-600 uppercase tracking-[0.2em]">{caseItem.act || 'IPC'}</span>
                       <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{caseItem.year || '—'}</div>
                     </div>
-                    <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-orange-600 group-hover:text-white transition-all">
-                      <FileText size={19} />
+                    <div className="flex gap-2">
+                      <a 
+                        href={`http://localhost:5001/api/raw-pdfs/${caseItem.year}/${caseItem.filename}?download=true`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                        title="Download Original PDF"
+                      >
+                        <Download size={17} />
+                      </a>
+                      <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-orange-600 group-hover:text-white transition-all">
+                        <FileText size={19} />
+                      </div>
                     </div>
                   </div>
                   <h3 className="text-lg font-serif text-slate-900 mb-5 line-clamp-3 group-hover:text-orange-600 transition-colors leading-snug flex-1">
@@ -326,6 +336,26 @@ const CaseExplorerPage = () => {
 
                   {/* Modal Body */}
                   <div className="flex-1 overflow-y-auto px-10 py-8">
+                    {/* Primary Actions */}
+                    {!isDetailLoading && (
+                      <div className="flex gap-3 mb-8">
+                        <a 
+                          href={`http://localhost:5001/api/raw-pdfs/${selectedCase.year}/${selectedCase.filename}`} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg"
+                        >
+                          <Eye size={14} /> View Original PDF
+                        </a>
+                        <a 
+                          href={`http://localhost:5001/api/raw-pdfs/${selectedCase.year}/${selectedCase.filename}?download=true`}
+                          className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition-all"
+                        >
+                          <Download size={14} /> Download Copy
+                        </a>
+                      </div>
+                    )}
+
                     {isDetailLoading ? (
                       <div className="flex flex-col items-center justify-center py-20 gap-5">
                         <div className="relative w-16 h-16">

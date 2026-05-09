@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Search, FileText, Shield, ChevronDown, ChevronRight, Scale, Calendar, Gavel, Loader, AlertTriangle, Database } from 'lucide-react';
+import { Search, FileText, Shield, ChevronDown, ChevronRight, Scale, Calendar, Gavel, Loader, AlertTriangle, Database, Eye, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import PageTransition from '../components/PageTransition';
 import axios from 'axios';
@@ -190,6 +190,24 @@ export const MemoHistory = () => {
                                           {c.holding}
                                         </p>
                                       )}
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                      <a 
+                                        href={`http://localhost:5001/api/raw-pdfs/${c.year}/${c.filename}`} 
+                                        target="_blank" 
+                                        rel="noreferrer"
+                                        className="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-orange-600 hover:border-orange-200 transition-all shadow-sm"
+                                        title="View Original PDF"
+                                      >
+                                        <Eye size={14} />
+                                      </a>
+                                      <a 
+                                        href={`http://localhost:5001/api/raw-pdfs/${c.year}/${c.filename}?download=true`}
+                                        className="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm"
+                                        title="Download PDF"
+                                      >
+                                        <Download size={14} />
+                                      </a>
                                     </div>
                                   </div>
                                 ))}

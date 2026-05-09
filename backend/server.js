@@ -155,6 +155,35 @@ app.get('/api/history', async (req, res) => {
     }
 });
 
+// ── RAW PDF ENGINE ── Stream directly from D: drive for instant demo
+const path = require('path');
+const PDF_VAULT = 'D:\\Indian Judicial Data\\supreme_court_judgments';
+
+app.get('/api/raw-pdfs/:year/:filename', (req, res) => {
+    try {
+        const { year, filename } = req.params;
+        const cleanYear = year.trim();
+        const cleanFilename = filename.trim();
+        
+        const filePath = path.join(PDF_VAULT, cleanYear, cleanFilename);
+        
+        if (fs.existsSync(filePath)) {
+            if (req.query.download === 'true') {
+                res.download(filePath, cleanFilename);
+            } else {
+                res.contentType("application/pdf");
+                res.sendFile(filePath);
+            }
+        } else {
+            console.error(`[PDF Engine] File not found: ${filePath}`);
+            res.status(404).send('Judgment PDF not found in local vault');
+        }
+    } catch (error) {
+        console.error("[PDF Engine] Error:", error.message);
+        res.status(500).send('Internal Server Error while fetching PDF');
+    }
+});
+
 const PORT = 5001;
 app.listen(PORT, () => {
     console.log(`🚀 Express bridge running on http://127.0.0.1:${PORT}`);

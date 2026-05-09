@@ -22,6 +22,7 @@ def run_summarizer(cases: list):
         "crime_charges": "Specific criminal charges or sections invoked (e.g. 'IPC Section 420', 'PMLA Section 3', 'BNS Section 318'). If none, 'N/A'",
         "sentence_duration": "The prison sentence or penalty imposed (e.g. '7 years rigorous imprisonment', 'Life imprisonment', 'Fine of Rs. 5 Lakhs'). If not applicable (e.g. bail case), 'N/A'",
         "special_case_flag": "Is this a landmark, rarest-of-rare, constitutional bench, death penalty, or otherwise exceptional case? Answer 'Yes - [reason]' or 'No'",
+        "relevance_to_query": "A one-sentence explanation of why this case was selected as relevant to the user's specific query",
         "outcome": "Final disposition of the case, such as allowed, dismissed, granted, rejected, remanded, or similar"
 
         Rules:
@@ -65,6 +66,7 @@ def run_summarizer(cases: list):
             case['crime_charges'] = parsed.get("crime_charges", "N/A")
             case['sentence_duration'] = parsed.get("sentence_duration", "N/A")
             case['special_case_flag'] = parsed.get("special_case_flag", "No")
+            case['relevance_to_query'] = parsed.get("relevance_to_query", "Directly related to legal query.")
         except Exception as e:
             print(f"[Summarizer] Error parsing JSON for case {case['filename']}: {e}\nResponse was: {response}", flush=True)
             case['holding'] = "Failed to extract holding."
@@ -78,6 +80,7 @@ def run_summarizer(cases: list):
             case['crime_charges'] = "N/A"
             case['sentence_duration'] = "N/A"
             case['special_case_flag'] = "No"
+            case['relevance_to_query'] = "Selected based on semantic relevance."
             case['outcome'] = "Error"
             
         summarized_cases.append(case)
